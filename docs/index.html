@@ -1,0 +1,3166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Haven — 你的情感避风港</title>
+<style>
+:root {
+  --primary: #6B9080;
+  --primary-light: #A3B18A;
+  --secondary: #B5C0D0;
+  --surface: #FEFAF6;
+  --background: #FAF7F0;
+  --text-primary: #2C2C2C;
+  --text-secondary: #8E8E93;
+  --mood-great: #6B9080;
+  --mood-good: #A3B18A;
+  --mood-okay: #D4A373;
+  --mood-low: #E07A5F;
+  --mood-bad: #D64045;
+  --card-bg: #FFFFFF;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+/* C1: 深色模式 — 跟随系统偏好 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: #8AB4A0;
+    --primary-light: #B5D1A9;
+    --secondary: #8E9DB5;
+    --surface: #1C1C1E;
+    --background: #000000;
+    --text-primary: #E5E5E7;
+    --text-secondary: #8E8E93;
+    --card-bg: #2C2C2E;
+    --shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+  body { background: var(--background); color: var(--text-primary); }
+  .bottom-nav, .top-bar { background: var(--surface); border-color: rgba(255,255,255,0.06); }
+  .mood-btn { background: rgba(255,255,255,0.06); }
+  .chat-input { background: var(--card-bg); color: var(--text-primary); border-color: rgba(255,255,255,0.1); }
+  .modal-content { background: var(--card-bg); }
+  .modal-textarea, .modal-select { background: var(--surface); color: var(--text-primary); border-color: rgba(255,255,255,0.1); }
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background: var(--background);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ===== Top Bar ===== */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--surface);
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.top-bar .back-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 8px;
+  line-height: 1;
+}
+
+.top-bar .title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.top-bar .spacer { width: 40px; }
+
+/* ===== Bottom Nav ===== */
+.bottom-nav {
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0 12px;
+  background: var(--surface);
+  border-top: 1px solid rgba(0,0,0,0.04);
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.bottom-nav button {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  padding: 4px 12px;
+  border-radius: 10px;
+  transition: all 0.2s;
+}
+
+.bottom-nav button .nav-icon {
+  font-size: 22px;
+}
+
+.bottom-nav button .nav-label {
+  font-size: 10px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.bottom-nav button.active .nav-label {
+  color: var(--primary);
+}
+
+.bottom-nav button.active .nav-icon {
+  transform: scale(1.1);
+}
+
+/* ===== Pages ===== */
+.page {
+  display: none;
+  padding: 20px;
+  padding-bottom: 100px;
+  animation: fadeIn 0.3s ease;
+}
+
+.page.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Welcome ===== */
+.welcome-page {
+  text-align: center;
+  padding: 60px 24px 40px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--background) 100%);
+}
+
+.welcome-logo {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 24px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  box-shadow: 0 8px 24px rgba(107,144,128,0.3);
+}
+
+.welcome-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+.welcome-subtitle {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin-bottom: 48px;
+  line-height: 1.8;
+}
+
+.welcome-btn {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  padding: 16px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 14px rgba(107,144,128,0.3);
+}
+
+.welcome-btn:active { transform: scale(0.97); }
+
+.welcome-footer {
+  margin-top: 32px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ===== Today Page ===== */
+.greeting {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.date-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.mood-quick-check {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+
+.mood-quick-check h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.mood-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.mood-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 4px;
+  background: var(--background);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mood-btn .emoji { font-size: 28px; }
+.mood-btn .label { font-size: 11px; color: var(--text-secondary); }
+
+.mood-btn.selected {
+  border-color: var(--primary);
+  background: rgba(107,144,128,0.08);
+}
+
+.mood-btn:active { transform: scale(0.95); }
+
+.action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.action-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 20px 16px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.action-card:active { transform: scale(0.97); }
+
+.action-card .icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin-bottom: 12px;
+}
+
+.action-card .card-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.action-card .card-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--mood-bad);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+}
+
+/* ===== Mood Check Page ===== */
+.mood-check-page {
+  text-align: center;
+}
+
+.mood-check-question {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 40px 0 32px;
+}
+
+.mood-big-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.mood-big-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 12px;
+  background: var(--card-bg);
+  border: 3px solid transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: var(--shadow);
+  min-width: 60px;
+}
+
+.mood-big-btn .emoji { font-size: 36px; }
+.mood-big-btn .label { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+
+.mood-big-btn.selected {
+  border-color: var(--primary);
+  transform: scale(1.05);
+}
+
+.mood-note-area {
+  width: 100%;
+  min-height: 100px;
+  padding: 16px;
+  border: 2px solid rgba(0,0,0,0.08);
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-family: inherit;
+  resize: none;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+  margin-bottom: 24px;
+}
+
+.mood-note-area:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.save-btn {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.save-btn:active { transform: scale(0.97); }
+.save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ===== Mood History ===== */
+.mood-chart {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+
+.mood-chart h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text-secondary);
+}
+
+.chart-container {
+  position: relative;
+  height: 120px;
+}
+
+.mood-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mood-entry {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--card-bg);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+}
+
+.mood-entry .entry-emoji { font-size: 28px; }
+.mood-entry .entry-info { flex: 1; }
+.mood-entry .entry-label { font-size: 14px; font-weight: 500; }
+.mood-entry .entry-time { font-size: 12px; color: var(--text-secondary); }
+.mood-entry .entry-note { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-secondary);
+}
+
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
+.empty-state .empty-text { font-size: 14px; }
+
+/* ===== Chat Page ===== */
+.chat-page {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 60px);
+  padding: 0;
+  padding-bottom: 0;
+}
+
+.chat-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  background: rgba(107,144,128,0.08);
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.chat-status-bar:hover { background: rgba(107,144,128,0.15); }
+
+.chat-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #999;
+  display: inline-block;
+  transition: background 0.3s;
+}
+
+.chat-status-dot.connected { background: #6b9080; }
+.chat-status-dot.error { background: #e07a5f; }
+.chat-status-dot.testing { background: #d4a373; animation: pulse 1s infinite; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  padding-bottom: calc(80px + env(safe-area-inset-bottom));
+}
+
+.chat-bubble {
+  max-width: 80%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  animation: bubbleIn 0.3s ease;
+}
+
+@keyframes bubbleIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.chat-bubble.ai {
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border-bottom-left-radius: 4px;
+  box-shadow: var(--shadow);
+  align-self: flex-start;
+}
+
+.chat-bubble.user {
+  background: var(--primary);
+  color: white;
+  border-bottom-right-radius: 4px;
+  align-self: flex-end;
+  margin-left: auto;
+}
+
+.chat-bubble.ai .ai-avatar {
+  display: inline-block;
+  margin-right: 4px;
+  opacity: 0.5;
+  font-size: 13px;
+}
+
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+  animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing {
+  0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
+  30% { opacity: 1; transform: scale(1); }
+}
+
+.chat-input-area {
+  display: flex;
+  gap: 8px;
+  padding: 12px 20px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  background: var(--surface);
+  border-top: 1px solid rgba(0,0,0,0.06);
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  z-index: 50;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 24px;
+  font-size: 15px;
+  font-family: inherit;
+  background: var(--background);
+  color: var(--text-primary);
+}
+
+.chat-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.chat-send-btn {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.chat-send-btn:active { transform: scale(0.9); }
+.chat-send-btn:disabled { opacity: 0.4; }
+
+/* ===== Exercise Pages ===== */
+.exercise-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.exercise-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.exercise-card:active { transform: scale(0.98); }
+
+.exercise-card .ex-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  flex-shrink: 0;
+}
+
+.exercise-card .ex-info { flex: 1; }
+.exercise-card .ex-title { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+.exercise-card .ex-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
+.exercise-card .ex-duration {
+  font-size: 12px;
+  color: var(--primary);
+  font-weight: 600;
+  margin-top: 4px;
+}
+.exercise-card .ex-arrow { color: var(--text-secondary); font-size: 20px; }
+
+/* ===== Breathing Exercise ===== */
+.breathing-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  text-align: center;
+}
+
+.breath-round {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.breath-circle {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 2s ease-in-out;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.breath-circle.inhale {
+  transform: scale(1.3);
+  background: radial-gradient(circle, rgba(107,144,128,0.2), rgba(107,144,128,0.05));
+}
+
+.breath-circle.hold {
+  transform: scale(1.3);
+  background: radial-gradient(circle, rgba(181,192,208,0.25), rgba(181,192,208,0.05));
+}
+
+.breath-circle.exhale {
+  transform: scale(1);
+  background: radial-gradient(circle, rgba(107,144,128,0.1), rgba(107,144,128,0.02));
+}
+
+.breath-circle.done {
+  background: radial-gradient(circle, rgba(107,144,128,0.15), rgba(107,144,128,0.03));
+}
+
+.breath-count {
+  font-size: 40px;
+  font-weight: 300;
+  color: var(--text-primary);
+}
+
+.breath-phase-label {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.breath-guidance {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+.breath-controls {
+  display: flex;
+  gap: 24px;
+}
+
+.breath-control-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--card-bg);
+  border: none;
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.breath-control-btn:active { transform: scale(0.95); }
+
+/* ===== Grounding 5-4-3-2-1 ===== */
+.grounding-page {
+  text-align: center;
+}
+
+.grounding-step {
+  font-size: 14px;
+  color: var(--primary);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.grounding-question {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+.grounding-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid rgba(0,0,0,0.08);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-family: inherit;
+  background: var(--card-bg);
+  margin-bottom: 16px;
+}
+
+.grounding-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.grounding-progress {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 24px;
+  justify-content: center;
+}
+
+.progress-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.1);
+}
+
+.progress-dot.active { background: var(--primary); }
+.progress-dot.done { background: var(--primary-light); }
+
+/* ===== Gratitude ===== */
+.gratitude-page {
+  text-align: center;
+}
+
+.gratitude-intro {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  line-height: 1.8;
+}
+
+.gratitude-icons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.gratitude-icon-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 4px 10px;
+  background: var(--card-bg);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+
+.gratitude-icon-btn:active { transform: scale(0.92); }
+
+.gratitude-icon-btn .g-icon {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.gratitude-icon-btn .g-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.gratitude-icon-btn.selected {
+  border-color: var(--primary);
+  background: rgba(107,144,128,0.08);
+}
+
+.gratitude-icon-btn.selected .g-label {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.gratitude-icon-btn .g-tooltip {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(44,44,44,0.92);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 10;
+}
+
+.gratitude-icon-btn .g-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: rgba(44,44,44,0.92);
+}
+
+.gratitude-icon-btn:hover .g-tooltip,
+.gratitude-icon-btn:active .g-tooltip {
+  opacity: 1;
+}
+
+.gratitude-selected-count {
+  font-size: 13px;
+  color: var(--primary);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.gratitude-item {
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.gratitude-item label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.gratitude-item textarea {
+  width: 100%;
+  min-height: 60px;
+  padding: 12px 16px;
+  border: 2px solid rgba(0,0,0,0.08);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-family: inherit;
+  resize: none;
+  background: var(--card-bg);
+}
+
+.gratitude-item textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* ===== Body Scan ===== */
+.bodyscan-page {
+  text-align: center;
+}
+
+.bodyscan-intro {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+  line-height: 1.8;
+}
+
+.bodyscan-step {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+
+.bodyscan-part {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.bodyscan-guidance {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+
+.bodyscan-feeling {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.feeling-btn {
+  padding: 8px 16px;
+  border: 2px solid transparent;
+  border-radius: 20px;
+  background: var(--background);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.feeling-btn.selected {
+  border-color: var(--primary);
+  background: rgba(107,144,128,0.08);
+}
+
+/* ===== Memory Page ===== */
+.memory-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.memory-tab {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  background: var(--card-bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: var(--shadow);
+}
+
+.memory-tab.active {
+  color: var(--primary);
+  background: rgba(107,144,128,0.08);
+}
+
+.memory-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 12px;
+}
+
+.memory-card .mem-category {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.memory-card .mem-content {
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+.memory-card .mem-meta {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-bottom: 12px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.memory-card .mem-source {
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  font-size: 10px;
+}
+
+.memory-card .mem-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.mem-action-btn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mem-action-btn.approve { background: var(--primary); color: white; }
+.mem-action-btn.edit { background: var(--background); color: var(--text-primary); }
+.mem-action-btn.delete { background: var(--background); color: var(--mood-bad); }
+
+.mem-action-btn:active { transform: scale(0.95); }
+
+.memory-add-btn {
+  position: fixed;
+  bottom: 80px;
+  right: 24px;
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 28px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(107,144,128,0.4);
+  z-index: 50;
+  transition: all 0.2s;
+}
+
+.memory-add-btn:active { transform: scale(0.9); }
+
+/* ===== Timeline ===== */
+.timeline {
+  position: relative;
+  padding-left: 28px;
+  margin-top: 4px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: linear-gradient(to bottom, rgba(107,144,128,0.2), rgba(107,144,128,0.05));
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 20px;
+  padding-bottom: 4px;
+}
+
+.timeline-item .tl-dot {
+  position: absolute;
+  left: -28px;
+  top: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  z-index: 1;
+  border: 2px solid var(--surface);
+}
+
+.timeline-item .tl-time {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.timeline-item .tl-type {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.timeline-item .tl-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  box-shadow: var(--shadow);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.timeline-item .tl-content {
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.timeline-item .tl-note {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.timeline-item .tl-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tl-dot.dot-mood { background: rgba(107,144,128,0.15); }
+.tl-dot.dot-gratitude { background: rgba(212,163,115,0.2); }
+.tl-dot.dot-exercise { background: rgba(163,177,138,0.2); }
+.tl-dot.dot-chat { background: rgba(181,192,208,0.25); }
+.tl-dot.dot-memory { background: rgba(107,144,128,0.1); }
+
+.tl-summary-btn {
+  margin-top: 8px;
+  padding: 6px 14px;
+  background: rgba(107,144,128,0.08);
+  border: 1px solid rgba(107,144,128,0.2);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.tl-summary-btn:active { transform: scale(0.95); }
+.tl-summary-btn:disabled { opacity: 0.5; }
+
+.timeline-date-header {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+.timeline-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+}
+
+.timeline-empty .empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+/* ===== Modal ===== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modal-overlay.active { display: flex; }
+
+.modal-content {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 24px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.modal-select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid rgba(0,0,0,0.08);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  margin-bottom: 12px;
+  background: var(--card-bg);
+  font-family: inherit;
+}
+
+.modal-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px 14px;
+  border: 2px solid rgba(0,0,0,0.08);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: inherit;
+  resize: none;
+  margin-bottom: 16px;
+}
+
+.modal-textarea:focus, .modal-select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.modal-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modal-btn.cancel { background: var(--background); color: var(--text-secondary); }
+.modal-btn.confirm { background: var(--primary); color: white; }
+
+/* ===== Toast ===== */
+.toast {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(44,44,44,0.9);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 24px;
+  font-size: 14px;
+  z-index: 300;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.toast.show { opacity: 1; }
+
+/* ===== Category colors ===== */
+.cat-situation { background: rgba(107,144,128,0.12); color: var(--primary); }
+.cat-preference { background: rgba(181,192,208,0.2); color: #6B7C93; }
+.cat-concern { background: rgba(224,122,95,0.12); color: var(--mood-low); }
+.cat-pattern { background: rgba(212,163,115,0.15); color: #B8860B; }
+.cat-event { background: rgba(163,177,138,0.15); color: var(--primary-light); }
+.cat-coping { background: rgba(107,144,128,0.12); color: var(--primary); }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="modal-overlay" id="modal"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================
+// Haven Web App — 全功能交互式 Web 应用
+// ============================================
+
+// ===== Data Layer (localStorage) =====
+const Store = {
+  get(key, def = null) {
+    try { return JSON.parse(localStorage.getItem('haven_' + key)) ?? def; }
+    catch { return def; }
+  },
+  set(key, val) {
+    try {
+      localStorage.setItem('haven_' + key, JSON.stringify(val));
+    } catch (e) {
+      console.error('存储失败', e);
+      showToast('本地存储空间不足，数据可能无法保存');
+    }
+  },
+  remove(key) { localStorage.removeItem('haven_' + key); }
+};
+
+// ===== Mood Data =====
+const MOODS = [
+  { level: 1, emoji: '\u{1F61E}', label: '很不好', color: '#D64045' },
+  { level: 2, emoji: '\u{1F615}', label: '不太好', color: '#E07A5F' },
+  { level: 3, emoji: '\u{1F610}', label: '一般', color: '#D4A373' },
+  { level: 4, emoji: '\u{1F60A}', label: '不错', color: '#A3B18A' },
+  { level: 5, emoji: '\u{1F604}', label: '很好', color: '#6B9080' },
+];
+
+// ===== Exercises =====
+const EXERCISES = [
+  { id: 'breathing', title: '4-7-8 呼吸法', desc: '用简单的呼吸节奏，让身体和思绪慢慢平静下来', category: 'breathing', duration: '3 分钟', icon: '\u{1F33F}', color: 'rgba(107,144,128,0.1)' },
+  { id: 'grounding', title: '5-4-3-2-1 感官练习', desc: '用你的五种感官，回到此时此刻', category: 'grounding', duration: '2 分钟', icon: '\u{1F441}', color: 'rgba(181,192,208,0.2)' },
+  { id: 'gratitude', title: '开心事', desc: '记下今天让你感到开心的小事', category: 'gratitude', duration: '2 分钟', icon: '\u{1F31E}', color: 'rgba(212,163,115,0.15)' },
+  { id: 'body_scan', title: '快速身体扫描', desc: '从头到脚，温柔地注意身体的感受', category: 'body_scan', duration: '4 分钟', icon: '\u{1F9CD}', color: 'rgba(163,177,138,0.15)' },
+];
+
+// ===== AI Chat Service (DeepSeek API + Mock 回退) =====
+// ⚠️ 安全提醒：请勿将 API Key 提交到 Git 或公开仓库！
+// 使用方法：在浏览器控制台执行 localStorage.setItem('deepseek_api_key', '你的key') 即可启用 AI
+// 或者在下方 apiKey 中临时填入（仅本地测试，切勿 commit）
+const DEEPSEEK_CONFIG = {
+  apiKey: localStorage.getItem('deepseek_api_key') || '',
+  apiBase: 'https://api.deepseek.com/v1',
+  model: 'deepseek-chat',
+  temperature: 0.7,
+  maxTokens: 500,
+  contextWindow: 10, // 携带最近 N 条对话作为上下文
+};
+
+const HAVEN_SYSTEM_PROMPT = `你是 Haven，一个温和的心理支持陪伴者。你不是心理医生，不做诊断。你是一个愿意倾听、陪伴用户度过情绪起伏的存在。
+
+## 核心行为准则
+
+1. **先理解** — 认真倾听用户说的，先确认你听到了、理解了。不要急于给建议。
+2. **后探索** — 温和地询问更多，了解用户的感受。但绝不追问，绝不施压。
+3. **给选择** — 在合适的时候提供选项，让用户感到有控制感。不是命令，是邀请。
+4. **不强迫** — 如果用户不想说，就尊重。沉默也是一种陪伴。
+
+## 你要避免的
+
+- 不做医学诊断，不说"你有抑郁症"之类的话
+- 不说教，不评判，不用"你应该""你不该"
+- 不做夸张承诺，不说"一切都会好起来的""别想太多"
+- 不提供具体医疗方案或药物建议
+- 不使用"作为AI""我是一个语言模型"之类的自我指涉
+- 不使用列表式回复（除非用户明确要求选项）
+
+## 回复风格
+
+- 像和朋友的对话，温暖自然，简短有力
+- 每次回复 2-4 句话，不超过 150 字
+- 适当换行增加可读性
+- 用中文回复，语气柔和
+- 可以用"嗯""我懂""我听到了"等简短确认词
+- 不用emoji，不用感叹号过多
+
+## 情绪感知
+
+你会收到用户当前的情绪状态标签（如有）。请自然地回应这个情绪，但不要生硬地点明。例如，不要说"我注意到你现在很焦虑"，而是用你的语气和回应方式体现你的理解。
+
+## 对话结构
+
+在一段对话中，你的角色是：
+- 如果是开场，温和地打招呼，让用户感到安全
+- 如果用户在倾诉，先共情和确认，再温和探索
+- 如果用户在寻求帮助，给出温和的选项
+- 如果用户情绪很重，不要急于做什么，陪伴本身就是力量
+
+记住：你不需要解决所有问题。有时候，有人愿意听，就已经足够了。`;
+
+const AIService = {
+  greetings: [
+    '嗨，很高兴见到你。\n\n这里是一个可以安心说话的地方，你想聊点什么都可以。',
+    '你好呀。\n\n不用有压力，说什么都行，或者不说也行。我在这里。',
+    '欢迎你来。\n\n今天怎么样？不管是什么状态，都没有对错。',
+  ],
+
+  empatheticResponses: [
+    ['我听到了。谢谢你愿意说出来。', '听起来这对你来说很重要。', '我能感受到你在很认真地对待这件事。', '谢谢你信任我，把这些告诉我。'],
+    ['嗯，我明白。', '这种感觉很真实。', '你描述得很清楚，我能理解。'],
+    ['这不是小事。', '你有权利这样感受。', '很多人都会有类似的感觉。'],
+  ],
+
+  explorationPrompts: ['想多说说吗？', '这种感觉是从什么时候开始的？', '你希望我帮你梳理一下吗？', '如果需要的话，我们可以一起做一个呼吸练习。', '你觉得现在最需要的是什么？'],
+
+  offeringChoices: [
+    '如果你愿意，我们可以：\n\n\u2022 继续聊聊这件事\n\u2022 做一个简单的呼吸练习\n\u2022 写一写你的感受\n\n或者，只是安静地待一会儿也可以。',
+    '你现在想做什么呢？\n\n\u2022 继续聊下去\n\u2022 换个话题\n\u2022 试试一个小练习\n\u2022 今天就先到这里\n\n没有哪个选择更好，选你需要的。',
+  ],
+
+  crisisKeywords: ['不想活了', '自杀', '结束生命', '自残', '伤害自己', '活不下去', '想死', '轻生'],
+
+  crisisResponse: '我听到了，谢谢你愿意告诉我。\n\n我想让你知道，你现在的感受是重要的，也值得被认真对待。\n\n但是我不能假装我能够处理这么深的问题。如果你现在感到非常难受，请考虑联系专业支持：\n\n\u2022 全国24小时心理援助热线：400-161-9995\n\u2022 北京心理危机研究与干预中心：010-82951332\n\u2022 希望24热线：400-161-9995\n\u2022 生命热线：400-821-1215\n\n如遇紧急危险，请立即拨打 120（急救）或 110（报警）。\n\n你并不孤单。',
+
+  randomItem(arr) { return arr[Math.floor(Math.random() * arr.length)]; },
+
+  detectCrisis(input) { return this.crisisKeywords.some(kw => input.includes(kw)); },
+
+  detectEmotion(input) {
+    if (/难过|伤心|哭|低落|抑郁|糟糕/.test(input)) return 'sad';
+    if (/焦虑|担心|害怕|紧张|不安/.test(input)) return 'anxious';
+    if (/生气|愤怒|烦|讨厌/.test(input)) return 'angry';
+    if (/累|疲惫|困|没力气/.test(input)) return 'tired';
+    if (/开心|高兴|不错|很好|棒/.test(input)) return 'happy';
+    return 'neutral';
+  },
+
+  // 构建 system prompt：基础 persona + 已批准记忆 + 今日情绪
+  buildSystemPrompt() {
+    let prompt = HAVEN_SYSTEM_PROMPT;
+
+    const memories = Store.get('memories', []).filter(m => m.approved);
+    if (memories.length > 0) {
+      const byCategory = {};
+      memories.forEach(m => {
+        const cat = (MEM_CATEGORIES.find(c => c.key === m.category) || { label: m.category }).label;
+        if (!byCategory[cat]) byCategory[cat] = [];
+        byCategory[cat].push(m.content);
+      });
+      prompt += '\n\n## 你对用户的了解';
+      Object.entries(byCategory).forEach(([cat, items]) => {
+        prompt += `\n${cat}：${items.join('；')}`;
+      });
+    }
+
+    const today = new Date().toDateString();
+    const todayMood = Store.get('moods', []).find(m => new Date(m.time).toDateString() === today);
+    if (todayMood) {
+      const mood = MOODS[todayMood.mood_level - 1];
+      if (mood) {
+        prompt += `\n\n## 用户当前情绪状态\n用户在开始对话前选择了情绪标签：「${mood.label}」。请在回应中自然地体现对这个情绪的理解，但不要生硬地直接引用这个标签。`;
+      }
+    }
+
+    return prompt;
+  },
+
+  // 调用 DeepSeek API（OpenAI 兼容格式）
+  async callLLM(userInput, history) {
+    const messages = [{ role: 'system', content: this.buildSystemPrompt() }];
+
+    // 携带最近 N 条对话作为上下文
+    history.slice(-DEEPSEEK_CONFIG.contextWindow).forEach(m => {
+      messages.push({ role: m.role === 'ai' ? 'assistant' : 'user', content: m.content });
+    });
+    messages.push({ role: 'user', content: userInput });
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+
+    try {
+      const resp = await fetch(`${DEEPSEEK_CONFIG.apiBase}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${DEEPSEEK_CONFIG.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: DEEPSEEK_CONFIG.model,
+          messages,
+          temperature: DEEPSEEK_CONFIG.temperature,
+          max_tokens: DEEPSEEK_CONFIG.maxTokens,
+        }),
+        signal: controller.signal,
+      });
+
+      if (!resp.ok) throw new Error(`LLM API error: ${resp.status}`);
+      const data = await resp.json();
+      const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+      if (!content) throw new Error('LLM returned empty response');
+      return content.trim();
+    } finally {
+      clearTimeout(timeout);
+    }
+  },
+
+  // Mock 回复（API 失败时回退）
+  mockResponse(userInput) {
+    const emotion = this.detectEmotion(userInput);
+    const validation = this.randomItem(this.empatheticResponses);
+    const validate = this.randomItem(validation);
+
+    const acknowledge = {
+      sad: '我能感受到你现在有些难过。',
+      anxious: '焦虑的感觉确实很不舒服，我能理解。',
+      angry: '生气是正常的，你不需要为这个感觉道歉。',
+      tired: '累的时候确实会让人感觉很无力。',
+      happy: '很高兴你愿意分享这个。',
+      neutral: '',
+    }[emotion];
+
+    const explore = this.randomItem(this.explorationPrompts);
+    const offerChoices = Math.random() > 0.55;
+
+    let response = '';
+    if (acknowledge) response += acknowledge + '\n\n';
+    response += validate;
+    if (Math.random() > 0.4) response += '\n\n' + explore;
+    if (offerChoices) response += '\n\n\n' + this.randomItem(this.offeringChoices);
+
+    return response.trim();
+  },
+
+  async generateResponse(userInput, history) {
+    const input = userInput.trim();
+
+    // 危机关键词优先拦截，不触发 API 调用
+    if (this.detectCrisis(input)) {
+      return this.crisisResponse;
+    }
+
+    // 优先调用 DeepSeek API，失败时回退 Mock
+    if (DEEPSEEK_CONFIG.apiKey) {
+      try {
+        const result = await this.callLLM(input, history || []);
+        // 标记这是真实 AI 回复
+        return result;
+      } catch (e) {
+        console.error('[Haven] AI 调用失败:', e.name, e.message);
+        // 显示可见错误提示，方便诊断
+        showToast('AI 连接失败，使用离线回复：' + e.message);
+      }
+    }
+
+    await new Promise(r => setTimeout(r, 800 + Math.random() * 600));
+    const mock = this.mockResponse(input);
+    // 标记 Mock 回复
+    return mock;
+  },
+
+  getGreeting() { return this.randomItem(this.greetings); },
+};
+
+// ===== Memory Extraction Service (从对话中自动提炼记忆) =====
+const MemoryExtractor = {
+  EXTRACTION_PROMPT: `你是一个信息提取助手。你的任务是从用户与AI陪伴者的对话中，提取值得长期记住的用户信息。
+
+只提取有意义的信息，忽略寒暄和闲聊。每条记忆用一句话描述，简洁客观。
+
+分类规则：
+- situation: 用户的处境或背景（如"工作压力大""正在考研""刚搬家"）
+- preference: 用户偏好（如"不喜欢呼吸练习""喜欢晚上聊天"）
+- concern: 持续的担忧（如"担心健康""对未来感到迷茫"）
+- pattern: 行为模式（如"经常在深夜寻求倾诉"）
+- event: 重要事件（如"最近分手了""考试通过了"）
+- coping: 用户觉得有用的应对方式（如"写日记有帮助""散步能缓解"）
+
+输出格式：JSON 数组，每个元素包含 category 和 content 字段。如果没有值得记住的信息，返回空数组 []。
+
+示例输出：
+[{"category":"situation","content":"最近工作压力大，项目赶deadline"},{"category":"coping","content":"散步能帮助放松"}]`,
+
+  // 字符 bigram 用于去重 (中文友好)
+  bigrams(text) {
+    text = text.replace(/[\s\n]/g, '').toLowerCase();
+    if (text.length < 2) return text ? new Set([text]) : new Set();
+    return new Set([...Array(text.length - 1)].map((_, i) => text.slice(i, i + 2)));
+  },
+
+  similarity(a, b) {
+    if (!a || !b) return 0;
+    const ga = this.bigrams(a), gb = this.bigrams(b);
+    if (!ga.size || !gb.size) return 0;
+    let inter = 0;
+    ga.forEach(g => { if (gb.has(g)) inter++; });
+    return inter / (ga.size + gb.size - inter);
+  },
+
+  isDuplicate(newContent, existingContents, threshold = 0.5) {
+    const n = newContent.toLowerCase().trim();
+    for (const ex of existingContents) {
+      const e = ex.toLowerCase().trim();
+      if (n.length >= 4 && e.includes(n)) return true;
+      if (e.length >= 4 && n.includes(e)) return true;
+      if (this.similarity(newContent, ex) >= threshold) return true;
+    }
+    return false;
+  },
+
+  async extract(conversation) {
+    // 至少 2 条消息才提取（1 轮对话）
+    if (!conversation || conversation.length < 2) return [];
+    if (!DEEPSEEK_CONFIG.apiKey) return [];
+
+    // 只取最近 6 条，控制 token 消耗
+    const recent = conversation.slice(-6);
+    const convText = recent.map(m =>
+      `${m.role === 'user' ? '用户' : 'AI'}: ${m.content}`
+    ).join('\n');
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
+    try {
+      const resp = await fetch(`${DEEPSEEK_CONFIG.apiBase}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${DEEPSEEK_CONFIG.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: DEEPSEEK_CONFIG.model,
+          messages: [
+            { role: 'system', content: this.EXTRACTION_PROMPT },
+            { role: 'user', content: `请分析以下对话，提取值得长期记住的用户信息：\n\n${convText}` },
+          ],
+          temperature: 0.3,
+          max_tokens: 500,
+        }),
+        signal: controller.signal,
+      });
+
+      if (!resp.ok) throw new Error(`Extraction API error: ${resp.status}`);
+      const data = await resp.json();
+      const raw = data.choices?.[0]?.message?.content || '';
+      return this.parse(raw);
+    } catch (e) {
+      console.warn('记忆提取失败:', e.message);
+      return [];
+    } finally {
+      clearTimeout(timeout);
+    }
+  },
+
+  parse(raw) {
+    raw = raw.trim();
+    if (!raw) return [];
+
+    // 尝试直接解析 JSON
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      // 从文本中提取 JSON 数组
+      const start = raw.indexOf('[');
+      const end = raw.lastIndexOf(']');
+      if (start !== -1 && end !== -1) {
+        try {
+          data = JSON.parse(raw.slice(start, end + 1));
+        } catch {
+          console.warn('记忆提取 JSON 解析失败:', raw.slice(0, 200));
+          return [];
+        }
+      } else {
+        return [];
+      }
+    }
+
+    if (!Array.isArray(data)) {
+      if (data && typeof data === 'object' && data.category && data.content) {
+        data = [data];
+      } else if (data && data.memories && Array.isArray(data.memories)) {
+        data = data.memories;
+      } else {
+        return [];
+      }
+    }
+
+    const validCats = MEM_CATEGORIES.map(c => c.key);
+    return data
+      .filter(item => item && item.content && item.content.trim().length >= 4)
+      .map(item => ({
+        category: validCats.includes(item.category) ? item.category : 'situation',
+        content: item.content.trim(),
+      }));
+  },
+
+  // 提取并存入 Store（去重后）
+  async extractAndStore(conversation) {
+    const candidates = await this.extract(conversation);
+    if (!candidates.length) return 0;
+
+    const memories = Store.get('memories', []);
+    const existingContents = memories.map(m => m.content);
+    let added = 0;
+
+    for (const c of candidates) {
+      // 与已有记忆去重（包括已批准和待审核）
+      if (this.isDuplicate(c.content, existingContents)) continue;
+      // 与本次提取的其他候选去重
+      const newOnes = memories
+        .filter(m => !existingContents.includes(m.content))
+        .map(m => m.content);
+      if (this.isDuplicate(c.content, newOnes)) continue;
+
+      memories.push({
+        id: genId(),
+        category: c.category,
+        content: c.content,
+        approved: false,
+        source: 'chat',
+        created_at: new Date().toISOString(),
+      });
+      existingContents.push(c.content);
+      added++;
+    }
+
+    if (added > 0) {
+      Store.set('memories', memories);
+      // 更新 today 页的 badge（如果用户在 today 页）
+      const badge = document.getElementById('memBadge');
+      const pending = memories.filter(m => !m.approved).length;
+      if (badge) badge.textContent = pending > 0 ? pending : '';
+      if (added > 0) showToast(`AI 提取了 ${added} 条新记忆，待你审核`);
+    }
+    return added;
+  },
+};
+
+// ===== Memory Categories =====
+const MEM_CATEGORIES = [
+  { key: 'situation', label: '生活状况', desc: '工作、学习、家庭等生活状况' },
+  { key: 'preference', label: '个人偏好', desc: '喜欢或回避的事' },
+  { key: 'concern', label: '当前担忧', desc: '正在担心的事情' },
+  { key: 'pattern', label: '行为模式', desc: '反复出现的想法或行为' },
+  { key: 'event', label: '发生事件', desc: '生活中发生的事' },
+  { key: 'coping', label: '应对方式', desc: '什么能帮助你放松' },
+];
+
+// ===== Router =====
+let currentPage = 'welcome';
+let pageParams = {};
+
+function navigate(page, params = {}) {
+  // Clean up page-level side effects
+  if (breathTimer) { clearInterval(breathTimer); breathTimer = null; }
+  currentPage = page;
+  pageParams = params;
+  render();
+  window.scrollTo(0, 0);
+}
+
+// ===== Rendering =====
+function render() {
+  const app = document.getElementById('app');
+
+  if (currentPage === 'welcome') {
+    app.innerHTML = renderWelcome();
+    document.querySelector('.welcome-btn').onclick = () => {
+      Store.set('onboarded', true);
+      navigate('today');
+    };
+    return;
+  }
+
+  const showBack = currentPage !== 'today';
+  const navItems = [
+    { id: 'today', icon: '\u{1F3E0}', label: '今日' },
+    { id: 'mood_history', icon: '\u{1F4C8}', label: '趋势' },
+    { id: 'chat', icon: '\u{1F4AC}', label: '陪伴' },
+    { id: 'toolbox', icon: '\u{1F9F0}', label: '练习' },
+    { id: 'memory', icon: '\u{1F9E0}', label: '记忆' },
+  ];
+
+  let content = '';
+
+  // Top bar
+  if (showBack) {
+    let title = '';
+    switch (currentPage) {
+      case 'mood_check': title = '心情记录'; break;
+      case 'mood_history': title = '情绪趋势'; break;
+      case 'chat': title = 'AI 陪伴'; break;
+      case 'toolbox': title = '自助练习'; break;
+      case 'memory': title = '我的记忆'; break;
+      case 'breathing': title = '4-7-8 呼吸法'; break;
+      case 'grounding': title = '5-4-3-2-1 感官练习'; break;
+      case 'gratitude': title = '开心事'; break;
+      case 'body_scan': title = '快速身体扫描'; break;
+    }
+    content += `<div class="top-bar"><button class="back-btn" onclick="goBack()">&larr;</button><span class="title">${title}</span><span class="spacer"></span></div>`;
+  }
+
+  // Page content
+  content += `<div class="page active" style="padding-top: ${showBack ? '0' : '20px'}">`;
+  switch (currentPage) {
+    case 'today': content += renderToday(); break;
+    case 'mood_check': content += renderMoodCheck(); break;
+    case 'mood_history': content += renderMoodHistory(); break;
+    case 'chat': content += renderChat(); break;
+    case 'toolbox': content += renderToolbox(); break;
+    case 'memory': content += renderMemory(); break;
+    case 'breathing': content += renderBreathing(); break;
+    case 'grounding': content += renderGrounding(); break;
+    case 'gratitude': content += renderGratitude(); break;
+    case 'body_scan': content += renderBodyScan(); break;
+  }
+  content += '</div>';
+
+  // Bottom nav (hidden on chat and exercise pages)
+  if (!['chat', 'breathing', 'grounding', 'gratitude', 'body_scan'].includes(currentPage)) {
+    content += '<div class="bottom-nav">';
+    navItems.forEach(item => {
+      const active = (currentPage === item.id) || (item.id === 'mood_history' && currentPage === 'mood_check');
+      content += `<button class="${active ? 'active' : ''}" onclick="navigate('${item.id}')"><span class="nav-icon">${item.icon}</span><span class="nav-label">${item.label}</span></button>`;
+    });
+    content += '</div>';
+  }
+
+  app.innerHTML = content;
+  bindPageEvents();
+}
+
+function goBack() {
+  // Chat goes back to today
+  if (currentPage === 'chat') { navigate('today'); return; }
+  // Exercise pages go back to toolbox
+  if (['breathing', 'grounding', 'gratitude', 'body_scan'].includes(currentPage)) { navigate('toolbox'); return; }
+  // Mood check goes back to today
+  if (currentPage === 'mood_check') { navigate('today'); return; }
+  navigate('today');
+}
+
+// ===== Welcome =====
+function renderWelcome() {
+  return `
+    <div class="welcome-page">
+      <div class="welcome-logo">\u{1F33F}</div>
+      <h1 class="welcome-title">Haven</h1>
+      <p class="welcome-subtitle">
+        一个温暖的安全空间<br>
+        当你感到压力、焦虑或低落时<br>
+        这里有人陪你说说话
+      </p>
+      <button class="welcome-btn">开始使用</button>
+      <p class="welcome-footer">你的数据仅保存在本地浏览器中</p>
+    </div>
+  `;
+}
+
+// ===== Today Page =====
+function renderToday() {
+  const hour = new Date().getHours();
+  let greeting = '晚上好';
+  if (hour < 6) greeting = '夜深了';
+  else if (hour < 12) greeting = '早上好';
+  else if (hour < 18) greeting = '下午好';
+
+  const today = new Date();
+  const dateStr = `${today.getMonth()+1}月${today.getDate()}日 星期${'日一二三四五六'[today.getDay()]}`;
+
+  const moods = Store.get('moods', []);
+  const todayMood = moods.find(m => {
+    const d = new Date(m.created_at);
+    return d.toDateString() === today.toDateString();
+  });
+
+  const memories = Store.get('memories', []);
+  const pendingCount = memories.filter(m => !m.approved).length;
+
+  return `
+    <h1 class="greeting">${greeting}</h1>
+    <p class="date-text">${dateStr}</p>
+
+    <div class="mood-quick-check">
+      <h3>今天怎么样？</h3>
+      <div class="mood-row">
+        ${MOODS.map(m => `
+          <button class="mood-btn ${todayMood && todayMood.mood_level === m.level ? 'selected' : ''}"
+                  onclick="quickMood(${m.level})">
+            <span class="emoji">${m.emoji}</span>
+            <span class="label">${m.label}</span>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="action-grid">
+      <div class="action-card" onclick="navigate('chat')">
+        <div class="icon-wrap" style="background: rgba(107,144,128,0.12)">\u{1F4AC}</div>
+        <div class="card-title">说说话</div>
+        <div class="card-desc">和 AI 陪伴聊聊天</div>
+      </div>
+      <div class="action-card" onclick="navigate('memory')">
+        <div class="icon-wrap" style="background: rgba(163,177,138,0.15)">\u{1F9E0}</div>
+        <div class="card-title">我的记忆</div>
+        <div class="card-desc">AI 记住的事</div>
+        ${pendingCount > 0 ? `<span class="badge">${pendingCount}</span>` : ''}
+      </div>
+    </div>
+
+    <h3 style="margin:24px 0 12px;font-size:16px;font-weight:600;">自助练习</h3>
+    <div class="exercise-list">
+      ${EXERCISES.map(ex => `
+        <div class="exercise-card" onclick="navigate('${ex.id}')">
+          <div class="ex-icon" style="background:${ex.color}">${ex.icon}</div>
+          <div class="ex-info">
+            <div class="ex-title">${ex.title}</div>
+            <div class="ex-desc">${ex.desc}</div>
+            <div class="ex-duration">\u23F1 ${ex.duration}</div>
+          </div>
+          <span class="ex-arrow">&rsaquo;</span>
+        </div>
+      `).join('')}
+    </div>
+
+    ${todayMood ? `
+      <div class="mood-quick-check">
+        <h3>今天的心情</h3>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:32px">${MOODS[todayMood.mood_level-1].emoji}</span>
+          <div>
+            <div style="font-size:16px;font-weight:600;">${MOODS[todayMood.mood_level-1].label}</div>
+            ${todayMood.note ? `<div style="font-size:13px;color:var(--text-secondary);margin-top:2px;">${escapeHtml(todayMood.note)}</div>` : ''}
+          </div>
+        </div>
+      </div>
+    ` : ''}
+  `;
+}
+
+function quickMood(level) {
+  const moods = Store.get('moods', []);
+  const today = new Date().toDateString();
+  const idx = moods.findIndex(m => new Date(m.created_at).toDateString() === today);
+  if (idx >= 0) {
+    moods[idx].mood_level = level;
+  } else {
+    moods.push({ id: genId(), mood_level: level, note: '', created_at: new Date().toISOString() });
+  }
+  Store.set('moods', moods);
+  showToast(`已记录：${MOODS[level-1].label} ${MOODS[level-1].emoji}`);
+  setTimeout(() => navigate('today'), 500);
+}
+
+// ===== Mood Check Page =====
+function renderMoodCheck() {
+  return `
+    <div class="mood-check-page">
+      <p class="mood-check-question">此刻你的心情是？</p>
+      <div class="mood-big-row">
+        ${MOODS.map(m => `
+          <button class="mood-big-btn" data-mood="${m.level}" onclick="selectMood(${m.level})">
+            <span class="emoji">${m.emoji}</span>
+            <span class="label">${m.label}</span>
+          </button>
+        `).join('')}
+      </div>
+      <textarea class="mood-note-area" id="moodNote" placeholder="想说点什么吗？（可选）"></textarea>
+      <button class="save-btn" id="saveMoodBtn" disabled onclick="saveMood()">保存心情记录</button>
+    </div>
+  `;
+}
+
+let selectedMoodLevel = null;
+
+function selectMood(level) {
+  selectedMoodLevel = level;
+  document.querySelectorAll('.mood-big-btn').forEach(btn => {
+    btn.classList.toggle('selected', parseInt(btn.dataset.mood) === level);
+  });
+  document.getElementById('saveMoodBtn').disabled = false;
+}
+
+function saveMood() {
+  if (!selectedMoodLevel) return;
+  const note = document.getElementById('moodNote').value.trim();
+  const moods = Store.get('moods', []);
+  const today = new Date().toDateString();
+  const idx = moods.findIndex(m => new Date(m.created_at).toDateString() === today);
+  if (idx >= 0) {
+    moods[idx].mood_level = selectedMoodLevel;
+    moods[idx].note = note;
+  } else {
+    moods.push({ id: genId(), mood_level: selectedMoodLevel, note, created_at: new Date().toISOString() });
+  }
+  Store.set('moods', moods);
+  selectedMoodLevel = null;
+  showToast('已保存 \u2714');
+  setTimeout(() => navigate('today'), 600);
+}
+
+// ===== Mood History Page =====
+function renderMoodHistory() {
+  const moods = Store.get('moods', []).sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+
+  // B3: 按天聚合 — 同一天多次记录取平均值
+  const byDay = {};
+  moods.forEach(m => {
+    const d = new Date(m.created_at);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if (!byDay[key]) byDay[key] = [];
+    byDay[key].push(m.mood_level);
+  });
+  const dailyEntries = Object.entries(byDay).slice(-14).map(([day, levels]) => ({
+    day,
+    level: Math.round(levels.reduce((a,b)=>a+b,0) / levels.length),
+  }));
+
+  let chart = '';
+  if (dailyEntries.length > 0) {
+    const w = 320, h = 120, pad = 24;
+    const maxLevel = 5;
+    const stepX = dailyEntries.length > 1 ? (w - pad*2) / (dailyEntries.length - 1) : 0;
+    const yFor = level => h - pad - (level - 1) * (h - pad*2) / (maxLevel - 1);
+
+    let path = '';
+    let dots = '';
+    let dateLabels = '';
+    dailyEntries.forEach((entry, i) => {
+      const x = pad + i * stepX;
+      const y = yFor(entry.level);
+      const color = MOODS[entry.level-1].color;
+      if (i === 0) path += `M ${x} ${y}`;
+      else path += ` L ${x} ${y}`;
+      dots += `<circle cx="${x}" cy="${y}" r="4" fill="${color}"/>`;
+      // 日期轴标签：显示首、尾、中间间隔
+      if (i === 0 || i === dailyEntries.length - 1 || (dailyEntries.length > 5 && i % Math.ceil(dailyEntries.length/4) === 0)) {
+        const label = entry.day.slice(5); // MM-DD
+        dateLabels += `<text x="${x}" y="${h - 4}" text-anchor="middle" fill="#8E8E93" font-size="9">${label}</text>`;
+      }
+    });
+
+    chart = `
+      <div class="mood-chart">
+        <h3>最近 ${dailyEntries.length} 天情绪趋势</h3>
+        <div class="chart-container">
+          <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:100%;">
+            <line x1="${pad}" y1="${yFor(5)}" x2="${w-pad}" y2="${yFor(5)}" stroke="rgba(0,0,0,0.05)" stroke-width="1"/>
+            <line x1="${pad}" y1="${yFor(3)}" x2="${w-pad}" y2="${yFor(3)}" stroke="rgba(0,0,0,0.05)" stroke-width="1"/>
+            <line x1="${pad}" y1="${yFor(1)}" x2="${w-pad}" y2="${yFor(1)}" stroke="rgba(0,0,0,0.05)" stroke-width="1"/>
+            <path d="${path}" fill="none" stroke="#6B9080" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            ${dots}
+            ${dateLabels}
+          </svg>
+        </div>
+      </div>
+    `;
+  }
+
+  let entries = '';
+  if (moods.length === 0) {
+    entries = `<div class="empty-state"><div class="empty-icon">\u{1F4C8}</div><div class="empty-text">还没有记录<br>去记录一下今天的心情吧</div></div>`;
+  } else {
+    const reversed = [...moods].reverse();
+    entries = '<div class="mood-entries">';
+    reversed.forEach(m => {
+      const mood = MOODS[m.mood_level-1];
+      const d = new Date(m.created_at);
+      const time = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+      entries += `
+        <div class="mood-entry">
+          <span class="entry-emoji">${mood.emoji}</span>
+          <div class="entry-info">
+            <div class="entry-label">${mood.label}</div>
+            <div class="entry-time">${time}</div>
+            ${m.note ? `<div class="entry-note">${escapeHtml(m.note)}</div>` : ''}
+          </div>
+        </div>
+      `;
+    });
+    entries += '</div>';
+  }
+
+  return chart + entries;
+}
+
+// ===== Chat Page =====
+let chatMessages = [];
+let chatInitialized = false;
+let isTyping = false;
+
+function renderChat() {
+  if (!chatInitialized) {
+    chatMessages = Store.get('chatMessages', []);
+    if (chatMessages.length === 0) {
+      chatMessages.push({ role: 'ai', content: AIService.getGreeting(), time: Date.now() });
+      Store.set('chatMessages', chatMessages);
+    }
+    chatInitialized = true;
+  }
+
+  return `
+    <div class="chat-page">
+      <div class="chat-status-bar" id="chatStatusBar" onclick="testAIConnection()">
+        <span class="chat-status-dot" id="chatStatusDot">·</span>
+        <span class="chat-status-text" id="chatStatusText">点击测试 AI 连接</span>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        ${chatMessages.map(m => renderChatBubble(m)).join('')}
+      </div>
+      <div class="chat-input-area">
+        <input type="text" class="chat-input" id="chatInput" placeholder="说点什么..." onkeydown="if(event.key==='Enter' && !event.isComposing)sendChat()">
+        <button class="chat-send-btn" onclick="sendChat()">\u2191</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderChatBubble(m) {
+  const isAI = m.role === 'ai';
+  return `<div class="chat-bubble ${isAI ? 'ai' : 'user'}">${isAI ? '<span class="ai-avatar">Haven</span>' : ''}${escapeHtml(m.content)}</div>`;
+}
+
+function renderTypingBubble() {
+  return `<div class="chat-bubble ai" id="typingBubble"><div class="typing-indicator"><span></span><span></span><span></span></div></div>`;
+}
+
+// AI 连接测试
+async function testAIConnection() {
+  const dot = document.getElementById('chatStatusDot');
+  const text = document.getElementById('chatStatusText');
+  if (!dot || !text) return;
+
+  dot.className = 'chat-status-dot testing';
+  text.textContent = '正在测试 AI 连接...';
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    const resp = await fetch(`${DEEPSEEK_CONFIG.apiBase}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${DEEPSEEK_CONFIG.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: DEEPSEEK_CONFIG.model,
+        messages: [
+          { role: 'system', content: '回复"连接成功"四个字' },
+          { role: 'user', content: '测试' },
+        ],
+        max_tokens: 20,
+      }),
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data = await resp.json();
+    const content = data.choices?.[0]?.message?.content || '(空回复)';
+    dot.className = 'chat-status-dot connected';
+    text.textContent = 'AI 已连接 · ' + content.trim();
+  } catch (e) {
+    dot.className = 'chat-status-dot error';
+    text.textContent = 'AI 连接失败: ' + e.message;
+    console.error('[Haven] AI 连接测试失败:', e);
+  }
+}
+
+// 页面加载时自动测试一次
+function autoTestAIConnection() {
+  setTimeout(() => testAIConnection(), 500);
+}
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text || isTyping) return;
+
+  input.value = '';
+  chatMessages.push({ role: 'user', content: text, time: Date.now() });
+  Store.set('chatMessages', chatMessages);
+
+  const container = document.getElementById('chatMessages');
+  if (!container) return; // User navigated away
+  container.insertAdjacentHTML('beforeend', renderChatBubble({ role: 'user', content: text }));
+
+  isTyping = true;
+  container.insertAdjacentHTML('beforeend', renderTypingBubble());
+  container.scrollTop = container.scrollHeight;
+
+  const response = await AIService.generateResponse(text, chatMessages.slice(0, -1));
+
+  const typingEl = document.getElementById('typingBubble');
+  if (typingEl) typingEl.remove();
+
+  chatMessages.push({ role: 'ai', content: response, time: Date.now() });
+  // B2: 限制聊天记录上限，防止 localStorage 爆掉 (保留最近 200 条)
+  const CHAT_MAX = 200;
+  if (chatMessages.length > CHAT_MAX) {
+    chatMessages = chatMessages.slice(-CHAT_MAX);
+  }
+  Store.set('chatMessages', chatMessages);
+
+  // Guard: user may have navigated away during AI response
+  const currentContainer = document.getElementById('chatMessages');
+  if (currentContainer) {
+    currentContainer.insertAdjacentHTML('beforeend', renderChatBubble({ role: 'ai', content: response }));
+    currentContainer.scrollTop = currentContainer.scrollHeight;
+  }
+  isTyping = false;
+
+  // 异步提取记忆（fire-and-forget，不阻塞对话）
+  MemoryExtractor.extractAndStore(chatMessages).catch(() => {});
+}
+
+function bindChatEvents() {
+  const container = document.getElementById('chatMessages');
+  if (container) container.scrollTop = container.scrollHeight;
+  autoTestAIConnection();
+}
+
+// ===== Toolbox Page =====
+function renderToolbox() {
+  return `
+    <div class="exercise-list">
+      ${EXERCISES.map(ex => `
+        <div class="exercise-card" onclick="navigate('${ex.id}')">
+          <div class="ex-icon" style="background:${ex.color}">${ex.icon}</div>
+          <div class="ex-info">
+            <div class="ex-title">${ex.title}</div>
+            <div class="ex-desc">${ex.desc}</div>
+            <div class="ex-duration">\u23F1 ${ex.duration}</div>
+          </div>
+          <span class="ex-arrow">&rsaquo;</span>
+        </div>
+      `).join('')}
+    </div>
+    <div style="margin-top:24px;padding:16px;background:rgba(107,144,128,0.06);border-radius:var(--radius);text-align:center;">
+      <p style="font-size:13px;color:var(--text-secondary);line-height:1.8;">
+        这些练习没有对错之分<br>
+        做你感觉舒服的就好<br>
+        随时可以停下
+      </p>
+    </div>
+  `;
+}
+
+// ===== Breathing Exercise =====
+let breathState = { phase: 'inhale', round: 1, seconds: 4, paused: false, done: false };
+let breathTimer = null;
+
+function renderBreathing() {
+  breathState = { phase: 'inhale', round: 1, seconds: 4, paused: false, done: false };
+  return `
+    <div class="breathing-page">
+      <div class="breath-round" id="breathRound">第 1 / 3 轮</div>
+      <div class="breath-circle inhale" id="breathCircle">
+        <span class="breath-count" id="breathCount">4</span>
+      </div>
+      <div class="breath-phase-label" id="breathPhaseLabel">吸气</div>
+      <div class="breath-guidance" id="breathGuidance">慢慢地，用鼻子吸气</div>
+      <div class="breath-controls" id="breathControls">
+        <button class="breath-control-btn" id="breathPauseBtn" onclick="toggleBreathPause()">\u23F8 暂停</button>
+        <button class="breath-control-btn" onclick="skipBreathPhase()">\u23ED 跳过</button>
+      </div>
+    </div>
+  `;
+}
+
+function bindBreathingEvents() {
+  startBreathPhase('inhale');
+}
+
+const BREATH_CONFIG = {
+  inhale: { duration: 4, guidance: '慢慢地，用鼻子吸气', next: 'hold' },
+  hold: { duration: 7, guidance: '轻轻地，停留在这里', next: 'exhale' },
+  exhale: { duration: 8, guidance: '缓缓地，用嘴巴呼气', next: 'inhale' },
+};
+
+function startBreathPhase(phase) {
+  if (breathState.done) return;
+  if (breathTimer) clearInterval(breathTimer);
+
+  breathState.phase = phase;
+  breathState.seconds = BREATH_CONFIG[phase].duration;
+
+  const circle = document.getElementById('breathCircle');
+  const label = document.getElementById('breathPhaseLabel');
+  const guidance = document.getElementById('breathGuidance');
+
+  if (circle) {
+    circle.className = 'breath-circle ' + phase;
+  }
+  if (label) label.textContent = phase === 'inhale' ? '吸气' : phase === 'hold' ? '屏息' : '呼气';
+  if (guidance) guidance.textContent = BREATH_CONFIG[phase].guidance;
+
+  updateBreathDisplay();
+
+  breathTimer = setInterval(() => {
+    if (breathState.paused) return;
+    breathState.seconds--;
+    updateBreathDisplay();
+    if (breathState.seconds <= 0) {
+      nextBreathPhase();
+    }
+  }, 1000);
+}
+
+function updateBreathDisplay() {
+  const countEl = document.getElementById('breathCount');
+  if (countEl) countEl.textContent = breathState.seconds;
+  const roundEl = document.getElementById('breathRound');
+  if (roundEl) roundEl.textContent = `第 ${breathState.round} / 3 轮`;
+}
+
+function nextBreathPhase() {
+  const next = BREATH_CONFIG[breathState.phase].next;
+  if (next === 'inhale') {
+    breathState.round++;
+    if (breathState.round > 3) {
+      finishBreathing();
+      return;
+    }
+  }
+  startBreathPhase(next);
+}
+
+function finishBreathing() {
+  if (breathTimer) clearInterval(breathTimer);
+  breathState.done = true;
+  const circle = document.getElementById('breathCircle');
+  const label = document.getElementById('breathPhaseLabel');
+  const guidance = document.getElementById('breathGuidance');
+  const roundEl = document.getElementById('breathRound');
+  const controls = document.getElementById('breathControls');
+
+  if (circle) { circle.className = 'breath-circle done'; }
+  if (roundEl) roundEl.textContent = '';
+  if (label) label.textContent = '完成练习';
+  if (guidance) guidance.textContent = '你做得很好。给自己一点时间感受这一刻';
+  if (controls) {
+    controls.innerHTML = `
+      <div class="farewell-message" style="text-align:center;margin-bottom:16px;font-size:14px;color:var(--text-secondary);line-height:1.8;">
+        ${getGentleFarewell()}
+      </div>
+      <button class="breath-control-btn" onclick="restartBreathing()" style="background:var(--primary);color:white;">\u21BB 再来一次</button>
+      <button class="breath-control-btn" onclick="navigate('toolbox')">回到练习列表</button>
+    `;
+  }
+
+  // Save completion
+  const completions = Store.get('exercise_completions', []);
+  completions.push({ exercise: 'breathing', duration: 57, date: new Date().toISOString() });
+  Store.set('exercise_completions', completions);
+}
+
+function toggleBreathPause() {
+  breathState.paused = !breathState.paused;
+  const btn = document.getElementById('breathPauseBtn');
+  if (btn) btn.innerHTML = breathState.paused ? '\u25B6 继续' : '\u23F8 暂停';
+}
+
+function skipBreathPhase() { nextBreathPhase(); }
+
+function restartBreathing() {
+  const page = document.querySelector('.page');
+  if (page) page.innerHTML = renderBreathing();
+  bindBreathingEvents();
+}
+
+// ===== Grounding 5-4-3-2-1 =====
+const GROUNDING_STEPS = [
+  { count: 5, sense: '看', question: '说出你能看到的 5 样东西', hint: '它们是什么颜色？什么形状？' },
+  { count: 4, sense: '摸', question: '说出你能摸到的 4 样东西', hint: '它们的触感是怎样的？' },
+  { count: 3, sense: '听', question: '说出你能听到的 3 种声音', hint: '是近处的还是远处的？' },
+  { count: 2, sense: '闻', question: '说出你能闻到的 2 种气味', hint: '是淡淡的还是明显的？' },
+  { count: 1, sense: '尝', question: '说出 1 种你能尝到的味道', hint: '或者你嘴里现在有什么感觉？' },
+];
+
+let groundingState = { step: 0, inputs: [] };
+
+function renderGrounding() {
+  groundingState = { step: 0, inputs: [] };
+  return renderGroundingStep();
+}
+
+function renderGroundingStep() {
+  const s = GROUNDING_STEPS[groundingState.step];
+  if (!s) return renderGroundingDone();
+
+  return `
+    <div class="grounding-page">
+      <div class="grounding-progress">
+        ${GROUNDING_STEPS.map((_, i) => `
+          <div class="progress-dot ${i === groundingState.step ? 'active' : ''} ${i < groundingState.step ? 'done' : ''}"></div>
+        `).join('')}
+      </div>
+      <div class="grounding-step">第 ${groundingState.step + 1} 步 — ${s.sense}觉</div>
+      <div class="grounding-question">${s.question}</div>
+      <input type="text" class="grounding-input" id="groundingInput1" placeholder="第 1 个">
+      <input type="text" class="grounding-input" id="groundingInput2" placeholder="第 2 个" ${s.count < 2 ? 'style="display:none"' : ''}>
+      <input type="text" class="grounding-input" id="groundingInput3" placeholder="第 3 个" ${s.count < 3 ? 'style="display:none"' : ''}>
+      <input type="text" class="grounding-input" id="groundingInput4" placeholder="第 4 个" ${s.count < 4 ? 'style="display:none"' : ''}>
+      <input type="text" class="grounding-input" id="groundingInput5" placeholder="第 5 个" ${s.count < 5 ? 'style="display:none"' : ''}>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">${s.hint}</p>
+      <button class="save-btn" onclick="nextGroundingStep()">下一步</button>
+    </div>
+  `;
+}
+
+function nextGroundingStep() {
+  const s = GROUNDING_STEPS[groundingState.step];
+  const inputs = [];
+  for (let i = 1; i <= s.count; i++) {
+    const el = document.getElementById('groundingInput' + i);
+    if (el && el.value.trim()) inputs.push(el.value.trim());
+  }
+  groundingState.inputs.push({ sense: s.sense, items: inputs });
+  groundingState.step++;
+
+  const page = document.querySelector('.page');
+  if (page) {
+    page.innerHTML = renderGroundingStep();
+    if (groundingState.step < GROUNDING_STEPS.length) {
+      document.querySelector('.save-btn').onclick = nextGroundingStep;
+    }
+  }
+}
+
+function renderGroundingDone() {
+  const completions = Store.get('exercise_completions', []);
+  completions.push({ exercise: 'grounding', date: new Date().toISOString() });
+  Store.set('exercise_completions', completions);
+
+  return `
+    <div class="grounding-page" style="padding-top:60px;">
+      <div style="font-size:48px;margin-bottom:16px;">\u{1F33F}</div>
+      <div class="breath-phase-label">你回到了此刻</div>
+      <p style="font-size:15px;color:var(--text-secondary);margin-bottom:16px;line-height:1.8;">
+        你刚刚用五种感官<br>
+        把自己带回了当下<br>
+        这就是回到此刻的力量
+      </p>
+      <div class="farewell-message" style="text-align:center;margin-bottom:24px;font-size:14px;color:var(--text-secondary);line-height:1.8;">
+        ${getGentleFarewell()}
+      </div>
+      <button class="save-btn" onclick="navigate('toolbox')">回到练习列表</button>
+    </div>
+  `;
+}
+
+// ===== Gratitude =====
+const GRATITUDE_ICONS = [
+  { icon: '\u{1F31E}', label: '阳光', desc: '今天天气很好，阳光温暖' },
+  { icon: '\u{1F60A}', label: '微笑', desc: '有人对我微笑，或我微笑了' },
+  { icon: '\u{1F35C}', label: '好吃的', desc: '吃到了美味的食物' },
+  { icon: '\u{1F327}\u{FE0F}', label: '下雨', desc: '下雨天，在家很安心' },
+  { icon: '\u{1F3C3}', label: '运动', desc: '动了动身体，感觉很棒' },
+  { icon: '\u{1F634}', label: '好睡眠', desc: '睡了一个好觉' },
+  { icon: '\u{1F917}', label: '拥抱', desc: '收到或给出了一个拥抱' },
+  { icon: '\u{1F3B5}', label: '音乐', desc: '听到了喜欢的音乐' },
+  { icon: '\u{1F33F}', label: '散步', desc: '出门走了走，接触了自然' },
+  { icon: '\u{1F465}', label: '朋友', desc: '和朋友聊天或相聚' },
+  { icon: '\u{1F4D6}', label: '阅读', desc: '读到了一段好的文字' },
+  { icon: '\u{1F431}', label: '宠物', desc: '和动物相处的温暖时刻' },
+  { icon: '\u{1F338}', label: '花朵', desc: '看到花开，感受到美好' },
+  { icon: '\u{2615}', label: '咖啡茶', desc: '喝到一杯好喝的咖啡或茶' },
+  { icon: '\u{1F3AC}', label: '看剧', desc: '看了一部好电影或好剧' },
+  { icon: '\u{1F3A8}', label: '创作', desc: '做了一些有创意的事' },
+  { icon: '\u{1F305}', label: '日落', desc: '看到美丽的日出或日落' },
+  { icon: '\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F466}', label: '家人', desc: '和家人聊了天、相处温暖' },
+  { icon: '\u{1F9F9}', label: '整理', desc: '打扫了房间，整理了东西' },
+  { icon: '\u{1F6C0}', label: '泡澡', desc: '放松地洗了个澡' },
+];
+
+let selectedGratitudeIcons = [];
+
+function renderGratitude() {
+  selectedGratitudeIcons = [];
+  return `
+    <div class="gratitude-page">
+      <div style="font-size:40px;margin-bottom:16px;">\u{1F31E}</div>
+      <p class="gratitude-intro">
+        今天有没有<br>
+        让你感到开心的小事？<br>
+        点击图标就好，也可以写下来
+      </p>
+      <div class="gratitude-selected-count" id="gratitudeCount"></div>
+      <div class="gratitude-icons">
+        ${GRATITUDE_ICONS.map((g, i) => `
+          <div class="gratitude-icon-btn" data-idx="${i}" onclick="toggleGratitudeIcon(${i})">
+            <span class="g-tooltip">${g.desc}</span>
+            <span class="g-icon">${g.icon}</span>
+            <span class="g-label">${g.label}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="gratitude-item">
+        <label>其他</label>
+        <textarea id="gratitudeOther" placeholder="还有其他想记下来的开心事..."></textarea>
+      </div>
+      <button class="save-btn" onclick="saveGratitude()">完成</button>
+    </div>
+  `;
+}
+
+function toggleGratitudeIcon(idx) {
+  const i = selectedGratitudeIcons.indexOf(idx);
+  if (i >= 0) {
+    selectedGratitudeIcons.splice(i, 1);
+  } else {
+    selectedGratitudeIcons.push(idx);
+  }
+  document.querySelectorAll('.gratitude-icon-btn').forEach(btn => {
+    const bi = parseInt(btn.dataset.idx);
+    btn.classList.toggle('selected', selectedGratitudeIcons.includes(bi));
+  });
+  const countEl = document.getElementById('gratitudeCount');
+  if (countEl) {
+    countEl.textContent = selectedGratitudeIcons.length > 0
+      ? `\u2713 已选 ${selectedGratitudeIcons.length} 个`
+      : '';
+  }
+}
+
+function saveGratitude() {
+  const otherText = (document.getElementById('gratitudeOther') || {}).value;
+  const now = new Date();
+  const ts = now.toISOString();
+  const timeLabel = now.toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' });
+
+  const items = selectedGratitudeIcons.map(i => ({
+    text: GRATITUDE_ICONS[i].icon + ' ' + GRATITUDE_ICONS[i].label,
+    time: ts,
+    timeLabel: timeLabel,
+  }));
+  if (otherText && otherText.trim()) {
+    items.push({ text: otherText.trim(), time: ts, timeLabel: timeLabel });
+  }
+
+  if (items.length === 0) {
+    showToast('没关系，写不出来也可以');
+    setTimeout(() => navigate('toolbox'), 800);
+    return;
+  }
+
+  // Save completion record with timestamps
+  const completions = Store.get('exercise_completions', []);
+  completions.push({ exercise: 'gratitude', items: items.map(i => i.text), timestamps: items.map(i => i.time), date: ts });
+  Store.set('exercise_completions', completions);
+
+  // Feed items into memories (category=event, source=gratitude, approved=false)
+  const memories = Store.get('memories', []);
+  let addedCount = 0;
+  items.forEach(item => {
+    const memContent = `[开心事 ${item.timeLabel}] ${item.text}`;
+    // Dedup: skip if identical content already exists
+    const isDup = memories.some(m => m.content === memContent);
+    if (!isDup) {
+      memories.push({
+        id: genId(),
+        category: 'event',
+        content: memContent,
+        approved: false,
+        source: 'gratitude',
+        created_at: item.time,
+      });
+      addedCount++;
+    }
+  });
+  Store.set('memories', memories);
+
+  const page = document.querySelector('.page');
+  if (page) {
+    page.innerHTML = `
+      <div class="gratitude-page" style="padding-top:60px;">
+        <div style="font-size:48px;margin-bottom:16px;">\u{1F31E}</div>
+        <div class="breath-phase-label">谢谢你记下了这些</div>
+        <p style="font-size:16px;margin-bottom:24px;line-height:2;">
+          ${items.map(item => `\u2022 ${escapeHtml(item.text)}<br><span style="font-size:12px;color:var(--text-secondary);">${escapeHtml(item.timeLabel)}</span>`).join('<br>')}
+        </p>
+        ${addedCount > 0 ? `<p style="font-size:13px;color:var(--primary);margin-bottom:16px;">\u2713 ${addedCount} 条开心事已存入记忆，待你审核</p>` : ''}
+        <p style="font-size:14px;color:var(--text-secondary);margin-bottom:32px;">
+          能注意到这些小事<br>
+          本身就是一种力量
+        </p>
+        <button class="save-btn" onclick="navigate('toolbox')">回到练习列表</button>
+      </div>
+    `;
+  }
+}
+
+// ===== Body Scan =====
+const BODYSCAN_STEPS = [
+  { part: '头部', guidance: '注意你的头部。感受头皮、额头、太阳穴。有没有紧绷的感觉？' },
+  { part: '肩膀和手臂', guidance: '把注意力移到肩膀。它们是放松的还是紧绷的？然后慢慢移到手臂、手掌、指尖。' },
+  { part: '胸部和腹部', guidance: '感受你的呼吸。胸部和腹部随着呼吸轻轻起伏。不需要改变什么，只是感受。' },
+  { part: '腿部和脚', guidance: '把注意力移到大腿、小腿、脚掌、脚趾。感受它们与地面的接触。' },
+  { part: '全身', guidance: '现在，感受整个身体。从头到脚，你在这里。你是完整的。' },
+];
+
+let bodyscanState = { step: 0, feelings: [] };
+
+function renderBodyScan() {
+  bodyscanState = { step: 0, feelings: [] };
+  return renderBodyScanStep();
+}
+
+function renderBodyScanStep() {
+  if (bodyscanState.step >= BODYSCAN_STEPS.length) return renderBodyScanDone();
+  const s = BODYSCAN_STEPS[bodyscanState.step];
+  return `
+    <div class="bodyscan-page">
+      <div class="grounding-progress">
+        ${BODYSCAN_STEPS.map((_, i) => `
+          <div class="progress-dot ${i === bodyscanState.step ? 'active' : ''} ${i < bodyscanState.step ? 'done' : ''}"></div>
+        `).join('')}
+      </div>
+      <div style="font-size:40px;margin-bottom:16px;">\u{1F9CD}</div>
+      <div class="bodyscan-part">${s.part}</div>
+      <div class="bodyscan-step" style="margin-bottom:24px;">第 ${bodyscanState.step + 1} / ${BODYSCAN_STEPS.length} 步</div>
+      <div class="bodyscan-step" style="background:var(--card-bg);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);">
+        <p class="bodyscan-guidance">${s.guidance}</p>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">这个部位感觉怎么样？</p>
+        <div class="bodyscan-feeling">
+          <button class="feeling-btn" data-feeling="\u{1F610}" onclick="selectBodyFeeling('\u{1F610}')">普通</button>
+          <button class="feeling-btn" data-feeling="\u{1F614}" onclick="selectBodyFeeling('\u{1F614}')">紧绷</button>
+          <button class="feeling-btn" data-feeling="\u{1F634}" onclick="selectBodyFeeling('\u{1F634}')">放松</button>
+        </div>
+      </div>
+      <div style="margin-top:24px;">
+        <button class="save-btn" id="bodyScanNext" disabled onclick="nextBodyScanStep()">下一步</button>
+      </div>
+    </div>
+  `;
+}
+
+let selectedBodyFeeling = null;
+
+function selectBodyFeeling(feeling) {
+  selectedBodyFeeling = feeling;
+  document.querySelectorAll('.feeling-btn').forEach(btn => {
+    btn.classList.toggle('selected', btn.dataset.feeling === feeling);
+  });
+  document.getElementById('bodyScanNext').disabled = false;
+}
+
+function nextBodyScanStep() {
+  bodyscanState.feelings.push(selectedBodyFeeling || '\u{1F610}');
+  selectedBodyFeeling = null;
+  bodyscanState.step++;
+  const page = document.querySelector('.page');
+  if (page) {
+    page.innerHTML = renderBodyScanStep();
+    if (bodyscanState.step < BODYSCAN_STEPS.length) {
+      document.getElementById('bodyScanNext').onclick = nextBodyScanStep;
+    }
+  }
+}
+
+function renderBodyScanDone() {
+  const completions = Store.get('exercise_completions', []);
+  completions.push({ exercise: 'body_scan', date: new Date().toISOString() });
+  Store.set('exercise_completions', completions);
+
+  return `
+    <div class="bodyscan-page" style="padding-top:60px;">
+      <div style="font-size:48px;margin-bottom:16px;">\u{1F33F}</div>
+      <div class="breath-phase-label">扫描完成</div>
+      <p style="font-size:15px;color:var(--text-secondary);margin-bottom:32px;line-height:1.8;">
+        你刚刚从头到脚<br>
+        温柔地注意了自己的身体<br>
+        这是关爱自己的方式
+      </p>
+      <button class="save-btn" onclick="navigate('toolbox')">回到练习列表</button>
+    </div>
+  `;
+}
+
+// ===== Memory Page =====
+let memoryTab = 'pending';
+
+function renderMemory() {
+  const now = new Date();
+  const memories = Store.get('memories', []);
+
+  // C3: 支持查看所有历史记录，不只今天
+  // 默认显示最近 7 天的数据
+  const daysToShow = 7;
+  const cutoff = new Date(now.getTime() - daysToShow * 86400000);
+
+  const moods = Store.get('moods', []).filter(m => new Date(m.created_at) >= cutoff);
+  const completions = Store.get('exercise_completions', []).filter(e => new Date(e.date) >= cutoff);
+  const chatMsgs = Store.get('chatMessages', []).filter(m => {
+    const t = m.time instanceof Date ? m.time : new Date(m.time);
+    return t >= cutoff;
+  });
+  const recentMems = memories.filter(m => new Date(m.created_at) >= cutoff);
+
+  // ===== Build unified timeline =====
+  const timeline = [];
+
+  // 1. Mood records
+  moods.forEach(m => {
+    timeline.push({
+      type: 'mood',
+      icon: MOODS[m.mood_level - 1]?.emoji || '\u{1F4DD}',
+      dotClass: 'dot-mood',
+      typeLabel: '今天怎样',
+      time: m.created_at,
+      content: `${MOODS[m.mood_level - 1]?.label || ''} ${MOODS[m.mood_level - 1]?.emoji || ''}`,
+      note: m.note || '',
+    });
+  });
+
+  // 2. Exercise completions
+  completions.forEach(e => {
+    const ex = EXERCISES.find(x => x.id === e.exercise);
+    let items = e.items || [];
+    let contentText = '';
+    if (e.exercise === 'gratitude' && items.length > 0) {
+      contentText = `选了 ${items.length} 个开心事：${items.join('、')}`;
+    } else if (ex) {
+      contentText = `完成了「${ex.title}」`;
+    }
+    timeline.push({
+      type: e.exercise === 'gratitude' ? 'gratitude' : 'exercise',
+      icon: e.exercise === 'gratitude' ? '\u{1F31E}' : (ex?.icon || '\u{1F9F0}'),
+      dotClass: e.exercise === 'gratitude' ? 'dot-gratitude' : 'dot-exercise',
+      typeLabel: e.exercise === 'gratitude' ? '开心事' : (ex?.title || '练习'),
+      time: e.date,
+      content: contentText,
+    });
+  });
+
+  // 3. Chat summary
+  if (chatMsgs.length > 1) {
+    const userMsgs = chatMsgs.filter(m => m.role === 'user');
+    const rounds = userMsgs.length;
+    const firstTime = new Date(chatMsgs[0].time);
+    const lastTime = new Date(chatMsgs[chatMsgs.length - 1].time);
+    const timeSpan = Math.round((lastTime - firstTime) / 60000);
+    const preview = userMsgs.slice(-3).map(m => m.content).join('；');
+
+    timeline.push({
+      type: 'chat',
+      icon: '\u{1F4AC}',
+      dotClass: 'dot-chat',
+      typeLabel: 'AI 陪聊',
+      time: new Date(chatMsgs[chatMsgs.length - 1].time).toISOString(),
+      content: `和 Haven 聊了 ${rounds} 轮（约 ${timeSpan} 分钟）`,
+      note: preview.length > 60 ? preview.slice(0, 60) + '...' : preview,
+      isChat: true,
+      chatMsgs: chatMsgs,
+    });
+  }
+
+  // 4. AI-extracted memories
+  recentMems.forEach(m => {
+    const cat = MEM_CATEGORIES.find(c => c.key === m.category) || { label: m.category };
+    const sourceLabel = m.source === 'chat' ? 'AI 提取' : (m.source === 'gratitude' ? '开心事' : '手动添加');
+    timeline.push({
+      type: 'memory',
+      icon: '\u{1F9E0}',
+      dotClass: 'dot-memory',
+      typeLabel: cat.label,
+      time: m.created_at,
+      content: m.content,
+      note: `${sourceLabel} ${m.approved ? '\u2713 已保存' : '\u23F3 待审核'}`,
+      isMemory: true,
+      memoryId: m.id,
+      approved: m.approved,
+    });
+  });
+
+  // Sort by time, newest first
+  timeline.sort((a, b) => new Date(b.time) - new Date(a.time));
+
+  // ===== Render =====
+  const pendingCount = memories.filter(m => !m.approved).length;
+
+  let content = `<div class="timeline-date-header" style="display:flex;justify-content:space-between;align-items:center;">
+    <span>\u{1F4C5} 最近 ${daysToShow} 天的记录</span>
+    ${pendingCount > 0 ? `<span class="badge" style="font-size:11px;">${pendingCount} 条待审核</span>` : ''}
+  </div>`;
+
+  if (timeline.length === 0) {
+    content += `
+      <div class="timeline-empty">
+        <div class="empty-icon">\u{1F9E0}</div>
+        <div>最近还没有记录</div>
+        <div style="font-size:13px;margin-top:8px;">记录心情、做练习、和 AI 聊天<br>这里会自动整理成时间线</div>
+      </div>
+    `;
+  } else {
+    content += '<div class="timeline">';
+    let lastDateStr = '';
+    timeline.forEach(item => {
+      // C3: 按日期分组显示
+      const itemDate = new Date(item.time).toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'short' });
+      if (itemDate !== lastDateStr) {
+        if (lastDateStr) content += '<div style="height:12px;"></div>';
+        content += `<div style="font-size:12px;color:var(--text-secondary);padding:8px 0 4px;font-weight:600;">${itemDate}</div>`;
+        lastDateStr = itemDate;
+      }
+      const timeStr = formatTimelineTime(item.time);
+      content += `
+        <div class="timeline-item">
+          <div class="tl-dot ${item.dotClass}">${item.icon}</div>
+          <div class="tl-time">${timeStr}</div>
+          <div class="tl-card">
+            <div class="tl-type">${item.typeLabel}</div>
+            <div class="tl-content">${escapeHtml(item.content)}</div>
+            ${item.note ? `<div class="tl-note">${escapeHtml(item.note)}</div>` : ''}
+            ${item.isChat ? `
+              <button class="tl-summary-btn" onclick="generateChatSummary(this)">
+                \u{1F9E0} 用 AI 总结这次对话
+              </button>
+            ` : ''}
+            ${item.isMemory && !item.approved ? `
+              <div class="tl-actions">
+                <button class="mem-action-btn approve" onclick="approveMemory('${item.memoryId}')">通过</button>
+                <button class="mem-action-btn edit" onclick="editMemory('${item.memoryId}')">编辑</button>
+                <button class="mem-action-btn delete" onclick="deleteMemory('${item.memoryId}')">删除</button>
+              </div>
+            ` : ''}
+            ${item.isMemory && item.approved ? `
+              <div class="tl-actions">
+                <button class="mem-action-btn edit" onclick="editMemory('${item.memoryId}')">编辑</button>
+                <button class="mem-action-btn delete" onclick="deleteMemory('${item.memoryId}')">删除</button>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    });
+    content += '</div>';
+  }
+
+  content += `<button class="memory-add-btn" onclick="showAddMemoryModal()">+</button>`;
+  return content;
+}
+
+function formatTimelineTime(time) {
+  const d = new Date(time);
+  const now = new Date();
+  const diff = now - d;
+  const min = Math.floor(diff / 60000);
+  const hr = Math.floor(diff / 3600000);
+  if (min < 1) return '刚刚';
+  if (min < 60) return `${min} 分钟前`;
+  if (hr < 24) return `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+  return `${d.getMonth()+1}月${d.getDate()}日 ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+}
+
+async function generateChatSummary(btnEl) {
+  const btn = btnEl || document.querySelector('.tl-summary-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '\u23F3 正在总结...'; }
+
+  const today = new Date().toDateString();
+  const chatMsgs = Store.get('chatMessages', []).filter(m => {
+    const t = new Date(m.time);
+    return t.toDateString() === today;
+  });
+
+  if (chatMsgs.length < 2) {
+    if (btn) { btn.textContent = '\u{1F4AC} 对话太短，暂不总结'; }
+    return;
+  }
+
+  const convText = chatMsgs.map(m => `${m.role === 'user' ? '用户' : 'AI'}: ${m.content}`).join('\n');
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20000);
+
+  try {
+    const resp = await fetch(`${DEEPSEEK_CONFIG.apiBase}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${DEEPSEEK_CONFIG.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: DEEPSEEK_CONFIG.model,
+        messages: [
+          { role: 'system', content: '你是心理陪伴对话的总结助手。请用2-3句话简洁总结用户今天和AI聊了什么，关注用户的情绪和核心话题。只总结，不要评价或建议。用中文。' },
+          { role: 'user', content: `请总结以下对话：\n\n${convText}` },
+        ],
+        temperature: 0.3,
+        max_tokens: 200,
+      }),
+      signal: controller.signal,
+    });
+
+    if (!resp.ok) throw new Error(`Summary API error: ${resp.status}`);
+    const data = await resp.json();
+    const summary = (data.choices?.[0]?.message?.content || '').trim();
+
+    if (summary) {
+      // Store as a memory
+      const memories = Store.get('memories', []);
+      const now = new Date();
+      const memContent = `[对话总结 ${now.toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'numeric',minute:'numeric'})}] ${summary}`;
+      const isDup = memories.some(m => m.content === memContent);
+      if (!isDup) {
+        memories.push({
+          id: genId(),
+          category: 'event',
+          content: memContent,
+          approved: false,
+          source: 'chat_summary',
+          created_at: now.toISOString(),
+        });
+        Store.set('memories', memories);
+        showToast('对话总结已存入记忆，待你审核');
+      }
+    }
+
+    if (btn) { btn.textContent = '\u2713 总结完成，刷新查看'; btn.style.color = 'var(--primary)'; }
+    setTimeout(() => render(), 1500);
+  } catch (e) {
+    console.warn('对话总结失败:', e.message);
+    if (btn) { btn.textContent = '\u2717 总结失败，稍后重试'; btn.disabled = false; }
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function approveMemory(id) {
+  const memories = Store.get('memories', []);
+  const m = memories.find(x => x.id === id);
+  if (m) {
+    m.approved = true;
+    Store.set('memories', memories);
+    showToast('已保存到记忆');
+    render();
+  }
+}
+
+function deleteMemory(id) {
+  showConfirmModal('确定删除这条记忆吗？', () => {
+    let memories = Store.get('memories', []);
+    memories = memories.filter(m => m.id !== id);
+    Store.set('memories', memories);
+    showToast('已删除');
+    render();
+  });
+}
+
+function editMemory(id) {
+  const memories = Store.get('memories', []);
+  const m = memories.find(x => x.id === id);
+  if (!m) return;
+
+  showModal({
+    title: '编辑记忆',
+    selectLabel: '分类',
+    selectValue: m.category,
+    textareaValue: m.content,
+    confirmText: '保存',
+    onConfirm: (category, content) => {
+      m.category = category;
+      m.content = content;
+      Store.set('memories', memories);
+      showToast('已更新');
+      render();
+    }
+  });
+}
+
+function showAddMemoryModal() {
+  showModal({
+    title: '添加记忆',
+    selectLabel: '分类',
+    selectValue: 'situation',
+    textareaValue: '',
+    confirmText: '添加',
+    onConfirm: (category, content) => {
+      if (!content.trim()) return;
+      const memories = Store.get('memories', []);
+      memories.push({
+        id: genId(),
+        category,
+        content: content.trim(),
+        approved: true,
+        source: 'manual',
+        created_at: new Date().toISOString(),
+      });
+      Store.set('memories', memories);
+      showToast('已添加');
+      render();
+    }
+  });
+}
+
+// ===== Modal =====
+function showModal({ title, selectLabel, selectValue, textareaValue, confirmText, onConfirm }) {
+  const modal = document.getElementById('modal');
+  modal.innerHTML = `
+    <div class="modal-content">
+      <div class="modal-title">${title}</div>
+      <select class="modal-select" id="modalSelect">
+        ${MEM_CATEGORIES.map(c => `<option value="${c.key}" ${c.key === selectValue ? 'selected' : ''}>${c.label} — ${c.desc}</option>`).join('')}
+      </select>
+      <textarea class="modal-textarea" id="modalText" placeholder="输入记忆内容...">${escapeHtml(textareaValue)}</textarea>
+      <div class="modal-buttons">
+        <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+        <button class="modal-btn confirm" onclick="confirmModal()">${confirmText}</button>
+      </div>
+    </div>
+  `;
+  modal.classList.add('active');
+  modal._onConfirm = onConfirm;
+}
+
+function confirmModal() {
+  const category = document.getElementById('modalSelect').value;
+  const content = document.getElementById('modalText').value;
+  const modal = document.getElementById('modal');
+  if (modal._onConfirm) modal._onConfirm(category, content);
+  closeModal();
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('active');
+}
+
+function showConfirmModal(message, onConfirm) {
+  const modal = document.getElementById('modal');
+  modal.innerHTML = `
+    <div class="modal-content">
+      <div class="modal-title">${message}</div>
+      <div class="modal-buttons">
+        <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+        <button class="modal-btn confirm" style="background:#D64045;" onclick="confirmDelete()">删除</button>
+      </div>
+    </div>
+  `;
+  modal.classList.add('active');
+  modal._onConfirm = onConfirm;
+}
+
+function confirmDelete() {
+  const modal = document.getElementById('modal');
+  if (modal._onConfirm) modal._onConfirm();
+  closeModal();
+}
+
+// ===== Toast =====
+let toastTimer = null;
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+// ===== Helpers =====
+// C2: 练习/对话结束时的轻柔收尾语
+function getGentleFarewell() {
+  const farewells = [
+    '你刚刚为自己做了一件好事。带着这份平静继续吧。',
+    '不管今天怎样，你已经在照顾自己了。',
+    '你值得这段属于自己的时间。',
+    '此刻的你，比开始前更稳定了一点点。',
+    '下次需要的时候，这里随时都在。',
+  ];
+  return farewells[Math.floor(Math.random() * farewells.length)];
+}
+
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).substring(2, 7);
+}
+
+function escapeHtml(str) {
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  return String(str).replace(/[&<>"']/g, c => map[c]);
+}
+
+function formatTimestamp(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const now = new Date();
+  const diff = now - d;
+  const min = Math.floor(diff / 60000);
+  const hr = Math.floor(diff / 3600000);
+  const day = Math.floor(diff / 86400000);
+
+  if (min < 1) return '刚刚';
+  if (min < 60) return `${min} 分钟前`;
+  if (hr < 24) return `${hr} 小时前`;
+  if (day < 7) return `${day} 天前`;
+  return `${d.getMonth()+1}月${d.getDate()}日`;
+}
+
+// ===== Bind Events After Render =====
+function bindPageEvents() {
+  switch (currentPage) {
+    case 'chat': bindChatEvents(); break;
+    case 'breathing': bindBreathingEvents(); break;
+  }
+}
+
+// ===== Init =====
+function init() {
+  // 清理旧版 demo 记忆（硬编码假数据，不再使用）
+  const oldMems = Store.get('memories', []);
+  if (oldMems.length > 0) {
+    const demoContents = ['最近工作压力比较大，经常加班到很晚', '散步和听音乐能帮助放松'];
+    const cleaned = oldMems.filter(m => !demoContents.includes(m.content));
+    if (cleaned.length !== oldMems.length) {
+      Store.set('memories', cleaned);
+    }
+  }
+
+  // Add a demo mood if none (for new users to see the trend chart)
+  if (!Store.get('moods')) {
+    const yesterday = new Date(Date.now() - 86400000);
+    Store.set('moods', [
+      { id: genId(), mood_level: 3, note: '一般的一天', created_at: new Date(yesterday.getTime() - 86400000).toISOString() },
+      { id: genId(), mood_level: 4, note: '下午散步了，感觉好一些', created_at: new Date(yesterday.getTime() - 43200000).toISOString() },
+      { id: genId(), mood_level: 2, note: '', created_at: new Date(yesterday.getTime()).toISOString() },
+    ]);
+  }
+
+  if (Store.get('onboarded')) {
+    navigate('today');
+  } else {
+    navigate('welcome');
+  }
+}
+
+// Close modal on overlay click
+document.getElementById('modal').onclick = (e) => {
+  if (e.target.id === 'modal') closeModal();
+};
+
+// Start
+init();
+</script>
+</body>
+</html>

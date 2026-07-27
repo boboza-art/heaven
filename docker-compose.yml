@@ -1,0 +1,39 @@
+# Haven — Full Stack Docker Compose
+# Usage: docker compose up --build
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: haven
+      POSTGRES_PASSWORD: haven_dev
+      POSTGRES_DB: haven
+    ports:
+      - "5432:5432"
+    volumes:
+      - haven_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U haven"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg2://haven:haven_dev@db:5432/haven
+      JWT_SECRET_KEY: dev-secret-change-in-production
+      CORS_ORIGINS: http://localhost:3000,http://localhost:8080
+      # LLM — leave empty to use mock AI service
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_API_BASE: ${LLM_API_BASE:-https://api.openai.com/v1}
+      LLM_MODEL: ${LLM_MODEL:-gpt-4o-mini}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  haven_db:

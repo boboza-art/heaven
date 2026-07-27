@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Haven — AI 情感支持应用</title>
+<meta name="description" content="Haven — 帮助正在经历压力、焦虑、情绪低落的人，获得温和的心理支持。">
+<style>
+/* ===== Reset & Base ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+:root {
+  /* Haven Design System */
+  --primary: #6B9080;
+  --secondary: #B5C0D0;
+  --surface: #FEFAF6;
+  --bg: #FAF7F0;
+  --text-primary: #2C2C2C;
+  --text-secondary: #8E8E93;
+  --mood-great: #6B9080;
+  --mood-good: #A3B18A;
+  --mood-okay: #D4A373;
+  --mood-low: #E07A5F;
+  --mood-bad: #D64045;
+  --radius: 16px;
+  --shadow: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.08);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* ===== Hero ===== */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 48px 24px;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(ellipse at center, rgba(107,144,128,0.06) 0%, transparent 50%);
+  animation: pulse 8s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+.hero-logo {
+  width: 80px; height: 80px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, var(--primary), #5a7a6a);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; font-weight: 700;
+  color: white;
+  box-shadow: 0 8px 24px rgba(107,144,128,0.3);
+  margin-bottom: 24px;
+  position: relative; z-index: 1;
+}
+.hero h1 {
+  font-size: 48px; font-weight: 300;
+  letter-spacing: -1px;
+  margin-bottom: 12px;
+  position: relative; z-index: 1;
+}
+.hero .tagline {
+  font-size: 18px;
+  color: var(--text-secondary);
+  max-width: 480px;
+  margin-bottom: 32px;
+  position: relative; z-index: 1;
+}
+.hero-badges {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  justify-content: center;
+  position: relative; z-index: 1;
+}
+.badge {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.badge-version { background: rgba(107,144,128,0.12); color: var(--primary); }
+.badge-tech { background: rgba(181,192,208,0.2); color: #6b7c8e; }
+.badge-status { background: rgba(107,144,128,0.12); color: var(--primary); }
+
+.scroll-hint {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--text-secondary);
+  font-size: 13px;
+  animation: bounce 2s infinite;
+  z-index: 1;
+}
+@keyframes bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(8px); }
+}
+
+/* ===== Section ===== */
+.section {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 64px 24px;
+}
+.section-title {
+  font-size: 28px; font-weight: 400;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+.section-subtitle {
+  font-size: 15px;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+/* ===== Phone Mockup ===== */
+.phone-section {
+  display: flex;
+  gap: 48px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.phone-wrapper {
+  flex-shrink: 0;
+  position: relative;
+}
+.phone {
+  width: 320px;
+  height: 660px;
+  background: var(--bg);
+  border-radius: 44px;
+  border: 3px solid #e0ddd5;
+  overflow: hidden;
+  position: relative;
+  box-shadow: var(--shadow-lg);
+}
+.phone::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 28px;
+  background: #e0ddd5;
+  border-radius: 0 0 16px 16px;
+  z-index: 100;
+}
+.phone-screen {
+  width: 100%; height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.phone-screen::-webkit-scrollbar { display: none; }
+
+/* Screen switcher tabs */
+.screen-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 280px;
+}
+.screen-tab {
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid #eee;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.screen-tab:hover { border-color: var(--primary); background: var(--surface); }
+.screen-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+.screen-tab .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* Phone screen content */
+.app-header {
+  padding: 44px 20px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.app-header h2 { font-size: 22px; font-weight: 400; }
+.logout-chip {
+  padding: 4px 12px;
+  border-radius: 16px;
+  background: white;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.greeting {
+  padding: 0 20px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+/* Action cards */
+.action-card {
+  margin: 0 20px 12px;
+  padding: 16px;
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.action-card:active { transform: scale(0.98); }
+.action-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.action-body { flex: 1; }
+.action-title { font-size: 15px; font-weight: 500; }
+.action-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.badge-notify {
+  background: var(--mood-low);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-right: 8px;
+}
+.chevron { color: var(--text-secondary); opacity: 0.4; font-size: 18px; }
+
+/* Mood selector */
+.mood-selector {
+  padding: 60px 20px;
+  text-align: center;
+}
+.mood-selector h3 { font-size: 20px; font-weight: 400; margin-bottom: 8px; }
+.mood-selector p { font-size: 13px; color: var(--text-secondary); margin-bottom: 32px; }
+.mood-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.mood-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  padding: 8px;
+  border-radius: 12px;
+}
+.mood-item:hover { transform: translateY(-4px); }
+.mood-emoji {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  border: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+.mood-item.selected .mood-emoji { border-color: var(--primary); }
+.mood-label { font-size: 11px; color: var(--text-secondary); }
+
+/* Chat screen */
+.chat-header {
+  padding: 44px 16px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+.chat-avatar {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: rgba(181,192,208,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600;
+  color: var(--secondary);
+}
+.chat-title { font-size: 15px; font-weight: 500; }
+.chat-close { margin-left: auto; color: var(--text-secondary); cursor: pointer; }
+.chat-body {
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.chat-bubble {
+  max-width: 75%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.5;
+  animation: fadeInUp 0.4s ease;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.chat-bubble.ai {
+  background: white;
+  border-radius: 18px 18px 4px 18px;
+  box-shadow: var(--shadow);
+  align-self: flex-start;
+}
+.chat-bubble.user {
+  background: var(--primary);
+  color: white;
+  border-radius: 18px 18px 18px 4px;
+  align-self: flex-end;
+}
+.chat-input-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 8px 12px;
+  background: white;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.chat-input {
+  flex: 1;
+  padding: 8px 16px;
+  background: var(--surface);
+  border-radius: 22px;
+  border: none;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+.chat-send {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+
+/* Exercise screen */
+.exercise-list { padding: 44px 20px 20px; }
+.exercise-list h3 { font-size: 20px; font-weight: 400; margin-bottom: 16px; }
+.exercise-card {
+  padding: 16px;
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.ex-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.ex-title { font-size: 15px; font-weight: 500; }
+.ex-desc { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+.ex-meta { font-size: 11px; color: var(--primary); margin-top: 6px; }
+
+/* Memory screen */
+.memory-tabs {
+  display: flex;
+  padding: 44px 20px 0;
+  gap: 0;
+}
+.mem-tab {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+.mem-tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 500; }
+.mem-list { padding: 16px 20px; }
+.mem-card {
+  background: white;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow);
+}
+.mem-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.mem-content { font-size: 14px; line-height: 1.5; }
+.mem-actions { display: flex; gap: 8px; margin-top: 10px; }
+.mem-btn {
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  border: none;
+}
+.mem-btn-approve { background: rgba(107,144,128,0.12); color: var(--primary); }
+.mem-btn-edit { background: rgba(0,0,0,0.05); color: var(--text-secondary); }
+
+/* Mood history */
+.history-chart {
+  padding: 44px 20px 20px;
+}
+.history-chart h3 { font-size: 18px; font-weight: 400; margin-bottom: 16px; }
+.chart-svg { width: 100%; height: auto; }
+.history-list { padding: 0 20px 20px; }
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+.history-emoji { font-size: 24px; }
+.history-info { flex: 1; }
+.history-label { font-size: 14px; font-weight: 500; }
+.history-time { font-size: 11px; color: var(--text-secondary); }
+.history-note { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+/* Offline banner */
+.offline-banner {
+  background: rgba(224,122,95,0.1);
+  color: var(--mood-low);
+  font-size: 12px;
+  text-align: center;
+  padding: 6px;
+  animation: fadeIn 0.3s;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ===== Feature Grid ===== */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 32px;
+}
+.feature-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+.feature-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+.feature-card h3 { font-size: 17px; font-weight: 500; margin-bottom: 6px; }
+.feature-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+
+/* ===== Architecture ===== */
+.arch-diagram {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: var(--shadow);
+  margin-top: 32px;
+}
+.arch-layer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  position: relative;
+}
+.arch-layer:last-child { margin-bottom: 0; }
+.arch-arrow {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 20px;
+  margin: 2px 0;
+}
+.arch-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* ===== Tech Stack ===== */
+.tech-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 32px;
+}
+.tech-item {
+  padding: 8px 20px;
+  background: white;
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tech-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* ===== Timeline ===== */
+.timeline {
+  position: relative;
+  padding-left: 32px;
+  margin-top: 32px;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px; top: 0; bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--primary), var(--secondary), transparent);
+}
+.timeline-item {
+  position: relative;
+  padding-bottom: 28px;
+}
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -28px; top: 4px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 3px solid var(--surface);
+}
+.timeline-version { font-size: 15px; font-weight: 600; color: var(--primary); }
+.timeline-date { font-size: 12px; color: var(--text-secondary); }
+.timeline-desc { font-size: 14px; color: var(--text-primary); margin-top: 4px; }
+.timeline-stats { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+/* ===== Stats ===== */
+.stats-row {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 40px 0;
+}
+.stat {
+  text-align: center;
+}
+.stat-num {
+  font-size: 40px;
+  font-weight: 300;
+  color: var(--primary);
+}
+.stat-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* ===== Footer ===== */
+.footer {
+  text-align: center;
+  padding: 48px 24px;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+.footer p { font-size: 13px; color: var(--text-secondary); }
+.footer a { color: var(--primary); text-decoration: none; }
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .hero h1 { font-size: 36px; }
+  .phone-section { flex-direction: column; }
+  .section { padding: 40px 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-logo">H</div>
+  <h1>Haven</h1>
+  <p class="tagline">帮助正在经历压力、焦虑、情绪低落的人，获得温和的心理支持。</p>
+  <div class="hero-badges">
+    <span class="badge badge-version">v0.8.0</span>
+    <span class="badge badge-tech">Flutter + FastAPI + DeepSeek</span>
+    <span class="badge badge-status">112 个文件</span>
+  </div>
+  <div class="scroll-hint">向下滚动探索 ↓</div>
+</section>
+
+<!-- ===== STATS ===== -->
+<section class="section">
+  <div class="stats-row">
+    <div class="stat"><div class="stat-num">8</div><div class="stat-label">版本迭代</div></div>
+    <div class="stat"><div class="stat-num">112</div><div class="stat-label">项目文件</div></div>
+    <div class="stat"><div class="stat-num">54</div><div class="stat-label">Dart 文件</div></div>
+    <div class="stat"><div class="stat-num">113</div><div class="stat-label">测试用例</div></div>
+    <div class="stat"><div class="stat-num">9</div><div class="stat-label">路由页面</div></div>
+  </div>
+</section>
+
+<!-- ===== PHONE MOCKUP ===== -->
+<section class="section">
+  <h2 class="section-title">应用预览</h2>
+  <p class="section-subtitle">点击右侧标签切换不同页面</p>
+  <div class="phone-section">
+    <div class="phone-wrapper">
+      <div class="phone">
+        <div class="phone-screen" id="phoneScreen">
+          <!-- Screen content injected by JS -->
+        </div>
+      </div>
+    </div>
+    <div class="screen-tabs" id="screenTabs">
+      <div class="screen-tab active" data-screen="today">
+        <span class="dot" style="background:#6B9080"></span> 今日主页
+      </div>
+      <div class="screen-tab" data-screen="mood">
+        <span class="dot" style="background:#A3B18A"></span> 心情记录
+      </div>
+      <div class="screen-tab" data-screen="chat">
+        <span class="dot" style="background:#B5C0D0"></span> AI 陪伴
+      </div>
+      <div class="screen-tab" data-screen="exercises">
+        <span class="dot" style="background:#6B9080"></span> 自助练习
+      </div>
+      <div class="screen-tab" data-screen="memories">
+        <span class="dot" style="background:#D4A373"></span> 记忆管理
+      </div>
+      <div class="screen-tab" data-screen="history">
+        <span class="dot" style="background:#A3B18A"></span> 情绪趋势
+      </div>
+      <div class="screen-tab" data-screen="offline">
+        <span class="dot" style="background:#E07A5F"></span> 离线模式
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section class="section">
+  <h2 class="section-title">核心功能</h2>
+  <p class="section-subtitle">陪伴优先，不急于解决，不制造压力</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(107,144,128,0.12)">😊</div>
+      <h3>5 级心情记录</h3>
+      <p>从"很不好"到"很好"，用一分钟了解自己的状态。支持添加文字笔记，记录当下的感受。</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(181,192,208,0.2)">💬</div>
+      <h3>AI 陪伴对话</h3>
+      <p>接入 DeepSeek 大模型，遵循"先理解 → 后探索 → 给选择 → 不强迫"的 Persona 准则。</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(107,144,128,0.12)">🧘</div>
+      <h3>4 种自助练习</h3>
+      <p>4-7-8 呼吸法、5-4-3-2-1 感官练习、三件好事感恩、快速身体扫描。全部实现，含动画引导。</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(212,163,115,0.15)">🧠</div>
+      <h3>AI 记忆系统</h3>
+      <p>对话中自动提取关键信息，用户审批后注入下次对话。越聊越懂你，6 种分类智能去重。</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(163,177,138,0.2)">📈</div>
+      <h3>情绪趋势可视化</h3>
+      <p>CustomPainter 折线图展示最近 14 条心情记录，直观看到情绪变化趋势。</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(224,122,95,0.15)">📡</div>
+      <h3>离线缓存</h3>
+      <p>Repository 装饰器模式，网络断开时自动降级到本地缓存，聊天降级到本地 Mock AI。</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(181,192,208,0.2)">🔐</div>
+      <h3>JWT 认证</h3>
+      <p>完整的注册/登录/刷新流程，Dio 拦截器自动管理 token，路由守卫保护认证页面。</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(107,144,128,0.12)">🛡️</div>
+      <h3>危机安全拦截</h3>
+      <p>9 个危机关键词前置检测，不调用 API 直接返回安全响应 + 心理援助热线号码。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ARCHITECTURE ===== -->
+<section class="section">
+  <h2 class="section-title">系统架构</h2>
+  <p class="section-subtitle">Feature First + Monorepo + API First</p>
+  <div class="arch-diagram">
+    <div class="arch-layer" style="background:rgba(107,144,128,0.08)">
+      <span style="font-size:24px">📱</span>
+      <div>
+        <div style="font-weight:500;font-size:15px">Flutter Frontend</div>
+        <div style="font-size:13px;color:var(--text-secondary)">Riverpod · GoRouter · Dio · 54 Dart files</div>
+      </div>
+      <span class="arch-badge" style="background:rgba(107,144,128,0.15);color:var(--primary)">Mobile</span>
+    </div>
+    <div class="arch-arrow">↓ ↑</div>
+    <div class="arch-layer" style="background:rgba(181,192,208,0.12)">
+      <span style="font-size:24px">🔌</span>
+      <div>
+        <div style="font-weight:500;font-size:15px">API Layer (Dio + Interceptors)</div>
+        <div style="font-size:13px;color:var(--text-secondary)">JWT Auth · Auto Refresh · Offline Cache · Caching Repository</div>
+      </div>
+      <span class="arch-badge" style="background:rgba(181,192,208,0.2);color:#6b7c8e">Network</span>
+    </div>
+    <div class="arch-arrow">↓ ↑</div>
+    <div class="arch-layer" style="background:rgba(212,163,115,0.1)">
+      <span style="font-size:24px">⚙️</span>
+      <div>
+        <div style="font-weight:500;font-size:15px">FastAPI Backend</div>
+        <div style="font-size:13px;color:var(--text-secondary)">12 API endpoints · SQLAlchemy 2.0 · Alembic · bcrypt</div>
+      </div>
+      <span class="arch-badge" style="background:rgba(212,163,115,0.2);color:#a07840">Python</span>
+    </div>
+    <div class="arch-arrow">↓ ↑</div>
+    <div class="arch-layer" style="background:rgba(163,177,138,0.12)">
+      <span style="font-size:24px">🤖</span>
+      <div>
+        <div style="font-weight:500;font-size:15px">AI Pipeline</div>
+        <div style="font-size:13px;color:var(--text-secondary)">Safety → Context (history+mood+memories) → DeepSeek → Validator → Memory Extraction</div>
+      </div>
+      <span class="arch-badge" style="background:rgba(163,177,138,0.25);color:#5a7a4a">LLM</span>
+    </div>
+    <div class="arch-arrow">↓ ↑</div>
+    <div class="arch-layer" style="background:rgba(107,144,128,0.06)">
+      <span style="font-size:24px">🗄️</span>
+      <div>
+        <div style="font-weight:500;font-size:15px">PostgreSQL 16</div>
+        <div style="font-size:13px;color:var(--text-secondary)">Users · MoodLogs · ChatMessages · Memories · ExerciseCompletions</div>
+      </div>
+      <span class="arch-badge" style="background:rgba(107,144,128,0.12);color:var(--primary)">Database</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TECH STACK ===== -->
+<section class="section">
+  <h2 class="section-title">技术栈</h2>
+  <p class="section-subtitle">现代全栈架构，前后端完全对接</p>
+  <div class="tech-grid">
+    <div class="tech-item"><span class="tech-dot" style="background:#02569B"></span>Flutter</div>
+    <div class="tech-item"><span class="tech-dot" style="background:#0175C2"></span>Dart</div>
+    <div class="tech-item"><span class="tech-dot" style="background:#4F5BD5"></span>Riverpod</div>
+    <div class="tech-item"><span class="tech-dot" style="background:#5G5G5G"></span>GoRouter</div>
+    <div class="tech-item"><span class="tech-dot" style="background:#1f71c4"></span>Dio</div>
+    <div class="tech-item"><span class="tech-dot" style="background:#009688"></span>FastAPI</div>
+    <div class="tech-item"><span class="tech-dot" style="background:#3776AB"></span>Python 3.13</div>
+    <div class="tech-item"><span class="tech-dot" style="background:#336791"></span>PostgreSQL</div>
+    <div class="tech-item"><span class="tech-dot" style="background:#D4A373"></span>SQLAlchemy</div>
+    <div class="tech-item"><span class="tech-dot" style="background:#6B9080"></span>DeepSeek LLM</div>
+    <div class="tech-item"><span class="tech-dot" style="background:#2496ED"></span>Docker</div>
+    <div class="tech-item"><span class="tech-dot" style="background:#999"></span>JWT + bcrypt</div>
+  </div>
+</section>
+
+<!-- ===== TIMELINE ===== -->
+<section class="section">
+  <h2 class="section-title">版本历程</h2>
+  <p class="section-subtitle">从 MVP 到全栈应用，一天内的完整演进</p>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-version">v0.1-alpha</div>
+      <div class="timeline-date">2026-07-26</div>
+      <div class="timeline-desc">MVP 功能完整 — 欢迎页、心情记录、AI 对话（Mock）、4-7-8 呼吸练习</div>
+      <div class="timeline-stats">42 文件 · 12 文档 + 30 代码</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-version">v0.2.0</div>
+      <div class="timeline-date">2026-07-26</div>
+      <div class="timeline-desc">功能扩展 — 3 个新练习 + 情绪趋势页 + GoRouter 导航修复</div>
+      <div class="timeline-stats">49 文件 · +7</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-version">v0.3.0</div>
+      <div class="timeline-date">2026-07-26</div>
+      <div class="timeline-desc">后端搭建 — FastAPI + PostgreSQL + JWT Auth + Docker + 12 API 端点</div>
+      <div class="timeline-stats">81 文件 · +32 · 17/17 测试通过</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-version">v0.4.0</div>
+      <div class="timeline-date">2026-07-26</div>
+      <div class="timeline-desc">前后端对接 — Dio 网络层 + JWT 拦截器 + Auth Feature + 路由守卫</div>
+      <div class="timeline-stats">92 文件 · +11</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-version">v0.5.0</div>
+      <div class="timeline-date">2026-07-26</div>
+      <div class="timeline-desc">真实 LLM 接入 — DeepSeek deepseek-chat + 系统 Prompt + 上下文历史</div>
+      <div class="timeline-stats">95 文件 · +3 · 55 项 AI 测试</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-version">v0.6.0</div>
+      <div class="timeline-date">2026-07-26</div>
+      <div class="timeline-desc">记忆系统 — LLM 自动提取 + 中文 bigram 去重 + CRUD API + Prompt 注入</div>
+      <div class="timeline-stats">103 文件 · +8 · 58 项记忆测试</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-version">v0.7.0</div>
+      <div class="timeline-date">2026-07-26</div>
+      <div class="timeline-desc">前端记忆管理 — 双 Tab 页面 + 批准/编辑/删除/添加 + Badge 提醒</div>
+      <div class="timeline-stats">109 文件 · +6</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-version">v0.8.0</div>
+      <div class="timeline-date">2026-07-26</div>
+      <div class="timeline-desc">离线缓存 — Repository 装饰器模式 + ConnectivityService + LocalCache + 离线降级</div>
+      <div class="timeline-stats">112 文件 · +3</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <p style="font-size:16px;color:var(--text-primary);margin-bottom:8px">Haven</p>
+  <p>陪伴优先 · 不急于解决 · 不制造压力</p>
+  <p style="margin-top:12px">v0.8.0 · 112 文件 · Flutter + FastAPI + DeepSeek</p>
+</footer>
+
+<script>
+// ===== Screen Templates =====
+const screens = {
+  today: `
+    <div class="app-header">
+      <h2>今天</h2>
+      <div class="logout-chip">退出</div>
+    </div>
+    <div class="greeting">下午好，你今天感觉如何？</div>
+    <div class="action-card" onclick="selectMood(4)">
+      <div class="action-icon" style="background:rgba(163,177,138,0.2)">😊</div>
+      <div class="action-body">
+        <div class="action-title">记录心情</div>
+        <div class="action-sub">用一分钟了解自己的状态</div>
+      </div>
+      <span class="chevron">›</span>
+    </div>
+    <div class="action-card">
+      <div class="action-icon" style="background:rgba(181,192,208,0.2)">💬</div>
+      <div class="action-body">
+        <div class="action-title">聊一聊</div>
+        <div class="action-sub">和陪伴者说说心里话</div>
+      </div>
+      <span class="chevron">›</span>
+    </div>
+    <div class="action-card">
+      <div class="action-icon" style="background:rgba(107,144,128,0.12)">🧘</div>
+      <div class="action-body">
+        <div class="action-title">小练习</div>
+        <div class="action-sub">花几分钟，照顾自己</div>
+      </div>
+      <span class="chevron">›</span>
+    </div>
+    <div class="action-card">
+      <div class="action-icon" style="background:rgba(181,192,208,0.2)">🧠</div>
+      <div class="action-body">
+        <div class="action-title">我的记忆</div>
+        <div class="action-sub">AI 记住了 3 件事</div>
+      </div>
+      <span class="badge-notify">2</span>
+      <span class="chevron">›</span>
+    </div>
+    <div style="text-align:center;padding:20px">
+      <span style="font-size:13px;color:var(--primary);font-weight:500;cursor:pointer">查看心情记录</span>
+    </div>
+  `,
+
+  mood: `
+    <div style="padding:44px 20px 8px">
+      <h2 style="font-size:22px;font-weight:400">你现在感觉如何？</h2>
+      <p style="font-size:13px;color:var(--text-secondary);margin-top:4px">选一个最接近的</p>
+    </div>
+    <div class="mood-selector" style="padding-top:24px">
+      <div class="mood-row">
+        <div class="mood-item" onclick="selectMood(1)">
+          <div class="mood-emoji" style="background:rgba(214,64,69,0.1)">😞</div>
+          <div class="mood-label">很不好</div>
+        </div>
+        <div class="mood-item" onclick="selectMood(2)">
+          <div class="mood-emoji" style="background:rgba(224,122,95,0.1)">😕</div>
+          <div class="mood-label">不太好</div>
+        </div>
+        <div class="mood-item selected" onclick="selectMood(3)">
+          <div class="mood-emoji" style="background:rgba(212,163,115,0.15)">😐</div>
+          <div class="mood-label">一般</div>
+        </div>
+        <div class="mood-item" onclick="selectMood(4)">
+          <div class="mood-emoji" style="background:rgba(163,177,138,0.2)">😊</div>
+          <div class="mood-label">不错</div>
+        </div>
+        <div class="mood-item" onclick="selectMood(5)">
+          <div class="mood-emoji" style="background:rgba(107,144,128,0.12)">😄</div>
+          <div class="mood-label">很好</div>
+        </div>
+      </div>
+      <div style="margin-top:32px;text-align:left">
+        <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px">想说点什么吗？（可选）</div>
+        <div style="background:white;border-radius:12px;padding:12px;box-shadow:var(--shadow);min-height:60px;font-size:14px;color:var(--text-secondary)">
+          今天工作压力有点大，但下午散步了一会儿感觉好些了...
+        </div>
+      </div>
+      <div style="margin-top:24px">
+        <div style="background:var(--primary);color:white;padding:12px;border-radius:24px;font-size:15px;font-weight:500;cursor:pointer">保存</div>
+      </div>
+    </div>
+  `,
+
+  chat: `
+    <div class="chat-header">
+      <span class="chat-close">✕</span>
+      <div class="chat-avatar">伴</div>
+      <span class="chat-title">陪伴者</span>
+    </div>
+    <div class="chat-body">
+      <div class="chat-bubble ai">我在这里。今天想聊些什么？</div>
+      <div class="chat-bubble user">最近工作压力好大，项目赶deadline，感觉自己快撑不住了</div>
+      <div class="chat-bubble ai">听起来你现在承受着很大的压力，赶 deadline 的感觉确实让人焦虑。你能说说具体是什么让你感觉快撑不住了吗？是工作量大，还是时间太紧，或者还有别的？</div>
+      <div class="chat-bubble user">主要是工作量太大了，而且领导一直在催</div>
+      <div class="chat-bubble ai">工作量加上领导的催促，双重压力确实让人喘不过气。这种情况下，你会觉得连喘口气的时间都没有吗？有时候，哪怕只是几分钟的休息，也能让我们稍微缓过来一些。</div>
+    </div>
+    <div class="chat-input-bar">
+      <div class="chat-input">说说你想说的...</div>
+      <div class="chat-send">↑</div>
+    </div>
+  `,
+
+  exercises: `
+    <div class="exercise-list">
+      <h3>小练习</h3>
+      <div style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">花几分钟，照顾自己</div>
+      <div class="exercise-card">
+        <div class="ex-icon" style="background:rgba(107,144,128,0.12)">🌬️</div>
+        <div>
+          <div class="ex-title">4-7-8 呼吸法</div>
+          <div class="ex-desc">用简单的呼吸节奏，让身体和思绪慢慢平静下来</div>
+          <div class="ex-meta">呼吸 · 3 分钟</div>
+        </div>
+      </div>
+      <div class="exercise-card">
+        <div class="ex-icon" style="background:rgba(163,177,138,0.2)">🌱</div>
+        <div>
+          <div class="ex-title">5-4-3-2-1 感官练习</div>
+          <div class="ex-desc">用你的五种感官，回到此时此刻</div>
+          <div class="ex-meta">稳定 · 2 分钟</div>
+        </div>
+      </div>
+      <div class="exercise-card">
+        <div class="ex-icon" style="background:rgba(181,192,208,0.2)">💛</div>
+        <div>
+          <div class="ex-title">三件好事</div>
+          <div class="ex-desc">回忆今天三件让你感到温暖的小事</div>
+          <div class="ex-meta">感恩 · 3 分钟</div>
+        </div>
+      </div>
+      <div class="exercise-card">
+        <div class="ex-icon" style="background:rgba(212,163,115,0.15)">🧘</div>
+        <div>
+          <div class="ex-title">快速身体扫描</div>
+          <div class="ex-desc">从头到脚，温柔地注意身体的感受</div>
+          <div class="ex-meta">身体 · 4 分钟</div>
+        </div>
+      </div>
+    </div>
+  `,
+
+  memories: `
+    <div style="padding:44px 20px 0">
+      <h2 style="font-size:22px;font-weight:400">我的记忆</h2>
+    </div>
+    <div class="memory-tabs">
+      <div class="mem-tab active">待审 (2)</div>
+      <div class="mem-tab">已保存 (3)</div>
+    </div>
+    <div class="mem-list">
+      <div class="mem-card">
+        <span class="mem-tag" style="background:rgba(212,163,115,0.15);color:#a07840">当前担忧</span>
+        <div class="mem-content">工作压力大，项目赶 deadline，领导一直催</div>
+        <div class="mem-actions">
+          <button class="mem-btn mem-btn-approve">✓ 采纳</button>
+          <button class="mem-btn mem-btn-edit">编辑</button>
+        </div>
+      </div>
+      <div class="mem-card">
+        <span class="mem-tag" style="background:rgba(163,177,138,0.2);color:#5a7a4a">应对方式</span>
+        <div class="mem-content">散步能帮助放松，下午散步后感觉好些了</div>
+        <div class="mem-actions">
+          <button class="mem-btn mem-btn-approve">✓ 采纳</button>
+          <button class="mem-btn mem-btn-edit">编辑</button>
+        </div>
+      </div>
+    </div>
+    <div style="padding:0 20px 20px">
+      <div style="border-top:1px solid rgba(0,0,0,0.06);padding-top:16px">
+        <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px">已保存的记忆</div>
+        <div class="mem-card">
+          <span class="mem-tag" style="background:rgba(107,144,128,0.12);color:var(--primary)">生活状况</span>
+          <div class="mem-content">用户在互联网公司工作</div>
+        </div>
+        <div class="mem-card">
+          <span class="mem-tag" style="background:rgba(181,192,208,0.2);color:#6b7c8e">个人偏好</span>
+          <div class="mem-content">不喜欢呼吸练习，更喜欢倾诉</div>
+        </div>
+        <div class="mem-card">
+          <span class="mem-tag" style="background:rgba(107,144,128,0.12);color:var(--primary)">发生事件</span>
+          <div class="mem-content">最近和伴侣有些矛盾</div>
+        </div>
+      </div>
+    </div>
+  `,
+
+  history: `
+    <div class="history-chart">
+      <h3>情绪趋势</h3>
+      <div style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">最近 14 条记录</div>
+      <svg class="chart-svg" viewBox="0 0 280 120" xmlns="http://www.w3.org/2000/svg">
+        <line x1="20" y1="100" x2="270" y2="100" stroke="#eee" stroke-width="1"/>
+        <line x1="20" y1="20" x2="20" y2="100" stroke="#eee" stroke-width="1"/>
+        <!-- Trend line -->
+        <polyline points="30,70 55,50 80,80 105,60 130,40 155,55 180,30 205,45 230,25 255,40"
+          fill="none" stroke="#6B9080" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Area fill -->
+        <polygon points="30,70 55,50 80,80 105,60 130,40 155,55 180,30 205,45 230,25 255,40 255,100 30,100"
+          fill="rgba(107,144,128,0.08)"/>
+        <!-- Data points -->
+        <circle cx="30" cy="70" r="4" fill="#D4A373"/>
+        <circle cx="55" cy="50" r="4" fill="#A3B18A"/>
+        <circle cx="80" cy="80" r="4" fill="#E07A5F"/>
+        <circle cx="105" cy="60" r="4" fill="#D4A373"/>
+        <circle cx="130" cy="40" r="4" fill="#A3B18A"/>
+        <circle cx="155" cy="55" r="4" fill="#D4A373"/>
+        <circle cx="180" cy="30" r="4" fill="#6B9080"/>
+        <circle cx="205" cy="45" r="4" fill="#A3B18A"/>
+        <circle cx="230" cy="25" r="4" fill="#6B9080"/>
+        <circle cx="255" cy="40" r="4" fill="#A3B18A"/>
+        <!-- Labels -->
+        <text x="20" y="115" font-size="9" fill="#8E8E93">7天前</text>
+        <text x="230" y="115" font-size="9" fill="#8E8E93">今天</text>
+      </svg>
+    </div>
+    <div class="history-list">
+      <div class="history-item">
+        <span class="history-emoji">😊</span>
+        <div class="history-info">
+          <div class="history-label">不错</div>
+          <div class="history-time">今天 15:30</div>
+          <div class="history-note">散步后感觉好些了</div>
+        </div>
+      </div>
+      <div class="history-item">
+        <span class="history-emoji">😐</span>
+        <div class="history-info">
+          <div class="history-label">一般</div>
+          <div class="history-time">昨天 20:15</div>
+        </div>
+      </div>
+      <div class="history-item">
+        <span class="history-emoji">😕</span>
+        <div class="history-info">
+          <div class="history-label">不太好</div>
+          <div class="history-time">前天 14:00</div>
+          <div class="history-note">工作压力很大</div>
+        </div>
+      </div>
+      <div class="history-item">
+        <span class="history-emoji">😄</span>
+        <div class="history-info">
+          <div class="history-label">很好</div>
+          <div class="history-time">3天前 18:00</div>
+          <div class="history-note">和朋友吃了顿好的</div>
+        </div>
+      </div>
+    </div>
+  `,
+
+  offline: `
+    <div class="offline-banner">
+      📡 离线模式 — 正在显示缓存数据
+    </div>
+    <div class="app-header">
+      <h2>今天</h2>
+      <div class="logout-chip">退出</div>
+    </div>
+    <div class="greeting">下午好，你今天感觉如何？</div>
+    <div class="action-card">
+      <div class="action-icon" style="background:rgba(163,177,138,0.2)">😊</div>
+      <div class="action-body">
+        <div class="action-title">记录心情</div>
+        <div class="action-sub">用一分钟了解自己的状态</div>
+      </div>
+      <span class="chevron">›</span>
+    </div>
+    <div class="action-card">
+      <div class="action-icon" style="background:rgba(181,192,208,0.2)">💬</div>
+      <div class="action-body">
+        <div class="action-title">聊一聊</div>
+        <div class="action-sub">和陪伴者说说心里话</div>
+      </div>
+      <span class="chevron">›</span>
+    </div>
+    <div class="action-card">
+      <div class="action-icon" style="background:rgba(107,144,128,0.12)">🧘</div>
+      <div class="action-body">
+        <div class="action-title">小练习</div>
+        <div class="action-sub">花几分钟，照顾自己</div>
+      </div>
+      <span class="chevron">›</span>
+    </div>
+    <div style="padding:20px">
+      <div style="background:white;border-radius:16px;padding:16px;box-shadow:var(--shadow)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span style="font-size:24px">💬</span>
+          <span style="font-weight:500;font-size:15px">离线对话预览</span>
+        </div>
+        <div style="background:var(--surface);border-radius:12px;padding:12px;margin-top:8px">
+          <div style="font-size:14px;color:var(--text-primary)">你：今天好累啊</div>
+          <div style="font-size:14px;color:var(--text-primary);margin-top:8px">陪伴者：听起来今天确实让你很疲惫。你能说说是什么让你觉得累吗？是身体上的疲惫，还是心里的事情多？<span style="color:var(--mood-low);font-size:12px">（离线模式）</span></div>
+        </div>
+      </div>
+    </div>
+  `
+};
+
+// ===== Screen Switching =====
+const phoneScreen = document.getElementById('phoneScreen');
+const tabs = document.querySelectorAll('.screen-tab');
+
+function switchScreen(name) {
+  phoneScreen.innerHTML = screens[name] || '';
+  phoneScreen.scrollTop = 0;
+  tabs.forEach(t => t.classList.toggle('active', t.dataset.screen === name));
+}
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => switchScreen(tab.dataset.screen));
+});
+
+// Init with today screen
+switchScreen('today');
+
+// Mood selection interaction
+function selectMood(level) {
+  document.querySelectorAll('.mood-item').forEach((item, i) => {
+    item.classList.toggle('selected', i + 1 === level);
+  });
+}
+</script>
+</body>
+</html>

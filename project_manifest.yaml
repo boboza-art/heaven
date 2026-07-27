@@ -1,0 +1,78 @@
+project:
+  name: Haven
+  version: v0.8.0
+
+purpose:
+  category:
+    - ai_companion
+    - emotional_support
+    - mobile_application
+
+
+principles:
+
+  - empathy
+  - safety
+  - simplicity
+  - user_control
+
+
+stack:
+
+  mobile:
+    framework: Flutter
+    language: Dart
+
+  backend:
+    framework: FastAPI
+    language: Python
+
+  database:
+    primary: PostgreSQL
+
+  ai:
+    llm: DeepSeek (deepseek-chat)
+    pipeline: safety_check → context_building → llm → validator → memory_extraction
+
+  cache:
+    local: SharedPreferences
+    pattern: Repository Decorator (Caching*Repository)
+
+
+ai:
+
+  pipeline:
+
+    - safety_check
+    - context_building (history + mood + memories)
+    - llm_response (DeepSeek + Mock fallback)
+    - response_validation
+    - async_memory_extraction
+
+
+repository:
+  style: monorepo
+
+
+current_phase:
+  name: Full-Stack Complete with Offline Cache + Web Deployment
+  version: v0.8.0
+  files: 114
+
+mvp_goal:
+
+  - onboarding
+  - mood_check
+  - mood_history
+  - ai_chat (real LLM)
+  - exercises_all_implemented
+  - user_auth
+  - api_integration
+  - memory_system
+  - offline_cache
+  - web_app_deployed
+
+deployment:
+  github_pages: https://boboza-art.github.io/heaven/
+  cloudstudio: https://cbc312208f314a1081d474060d0f9f12.app.codebuddy.work
+  repository: https://github.com/boboza-art/heaven
