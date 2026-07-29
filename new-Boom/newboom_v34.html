@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh"><head><meta charset="UTF-8">
+<title>New-Boom v3.4 柔性双锥形长柱（120cm·弹性壁·自适应孔洞）</title>
+<style>
+ body{font-family:-apple-system,"PingFang SC",sans-serif;background:#0d1017;color:#e6ecf5;margin:0;padding:24px;}
+ h1{font-size:22px;margin:0 0 2px;} .sub{color:#8b9bb4;font-size:13px;margin-bottom:18px;}
+ .wrap{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;}
+ .panel{background:#161b26;border:1px solid #28313f;border-radius:14px;padding:16px;}
+ h2{font-size:15px;margin:0 0 12px;color:#5fd0ff;font-weight:600;}
+ .legend{font-size:12px;line-height:1.9;color:#c3cee0;margin-top:8px;}
+ .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;}
+ table{border-collapse:collapse;font-size:12px;margin-top:6px;}
+ td,th{border:1px solid #2c3646;padding:4px 9px;text-align:center;}
+ th{background:#1e2634;color:#9fd0ff;} .die{color:#ff7a7a;font-weight:600;} .live{color:#6ee7a8;font-weight:600;}
+</style></head>
+<body>
+<h1>New-Boom 应急气囊 · v3.4 柔性双锥形长柱</h1>
+<div class="sub">1格=20cm ｜ 人 175cm/90kg ｜ 柔性弹性壁锥形柱 下Ø13→上Ø26 × 120cm ｜ 等效行程~130cm（气柱120+材料变形10）· 2026-07-29</div>
+
+<div class="wrap">
+
+<div class="panel">
+<h2>系统剖面（按比例 · 柔性弹性壁 + 自适应孔洞）</h2>
+<svg width="470" height="780" viewBox="0 0 470 780">
+ <defs>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#1a2740"/><stop offset="1" stop-color="#0d1017"/></linearGradient>
+  <marker id="arr" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto">
+    <path d="M0,0 L7,3 L0,6 Z" fill="#ff6b6b"/></marker>
+  <linearGradient id="colflex" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#0f5c50"/><stop offset="0.5" stop-color="#2ee0bd"/><stop offset="1" stop-color="#0f5c50"/></linearGradient>
+ </defs>
+ <rect x="0" y="0" width="470" height="780" fill="url(#sky)"/>
+
+ <!-- 比例网格 每20cm=60px, 地面y=720 -->
+ <g stroke="#20293a" stroke-width="1">
+   <line x1="42" y1="720" x2="450" y2="720"/><line x1="42" y1="660" x2="450" y2="660"/>
+   <line x1="42" y1="600" x2="450" y2="600"/><line x1="42" y1="540" x2="450" y2="540"/>
+   <line x1="42" y1="480" x2="450" y2="480"/><line x1="42" y1="420" x2="450" y2="420"/>
+   <line x1="42" y1="360" x2="450" y2="360"/><line x1="42" y1="300" x2="450" y2="300"/>
+   <line x1="42" y1="240" x2="450" y2="240"/><line x1="42" y1="180" x2="450" y2="180"/>
+ </g>
+ <g fill="#4a5568" font-size="10">
+   <text x="22" y="723">0</text><text x="16" y="603">40</text><text x="16" y="483">80</text>
+   <text x="10" y="363">120</text><text x="10" y="243">160cm</text>
+ </g>
+
+ <!-- 缠绕副伞 -->
+ <path d="M155,58 Q255,26 355,58 Q335,82 255,74 Q175,82 155,58 Z" fill="#3d4c6b" opacity="0.75"/>
+ <text x="255" y="46" fill="#9fb0cc" font-size="11" text-anchor="middle">缠绕/塌陷副伞 — 钟摆效应保持人体脚朝下</text>
+ <line x1="210" y1="72" x2="233" y2="150" stroke="#6b7a99" stroke-width="1"/>
+ <line x1="300" y1="72" x2="277" y2="150" stroke="#6b7a99" stroke-width="1"/>
+
+ <!-- 人体 175cm 坐姿 -->
+ <g stroke="#0a0d13" stroke-width="1.2">
+  <path d="M240,150 a20,20 0 0,1 30,10 l-3,4 a17,17 0 0,0 -25,-8 z" fill="#3a4556"/>
+  <ellipse cx="255" cy="172" rx="18" ry="21" fill="#e0b48c"/>
+  <path d="M235,192 Q255,188 275,192 L283,300 Q255,312 229,300 Z" fill="#4573c4"/>
+  <path d="M275,200 Q297,230 291,290 L280,290 Q285,236 267,208 Z" fill="#3a5ca0"/>
+  <path d="M233,296 Q295,290 335,312 L337,338 Q290,330 231,332 Z" fill="#54658a"/>
+  <path d="M317,330 L337,332 L347,470 L325,470 Z" fill="#4a5b7e"/>
+  <path d="M323,468 L351,468 L355,486 L321,486 Z" fill="#2f3b52"/>
+ </g>
+ <text x="120" y="176" fill="#c3cee0" font-size="11">飞行员</text>
+ <text x="120" y="190" fill="#8b9bb4" font-size="10">175cm / 90kg</text>
+
+ <!-- 坐包 -->
+ <path d="M221,332 Q255,326 337,340 L341,368 Q255,382 217,368 Z" fill="#2b3548" stroke="#485a78"/>
+ <text x="120" y="356" fill="#9fb0cc" font-size="11">坐包 harness</text>
+
+ <!-- 段3 被动气室 -->
+ <ellipse cx="255" cy="392" rx="72" ry="18" fill="#c084fc" opacity="0.5" stroke="#c084fc"/>
+ <text x="358" y="394" fill="#d8b4fe" font-size="11">段3 被动气室</text>
+
+ <!-- 双发生器 -->
+ <rect x="205" y="404" width="18" height="15" rx="3" fill="#f59e0b"/>
+ <rect x="287" y="404" width="18" height="15" rx="3" fill="#f59e0b"/>
+ <text x="70" y="414" fill="#fbbf24" font-size="11">双发生器×2</text>
+ <text x="70" y="428" fill="#b0862a" font-size="10">各60L·独立</text>
+
+ <!-- 双锥形柱: 柔性弹性壁, 用波浪/鼓胀边缘表现"可大变形". 上粗Ø26下细Ø13, 120cm=360px, y=410->710 (300px可见到地面附近) -->
+ <!-- 左柱: 边缘用轻微外鼓的曲线表现弹性壁 -->
+ <path d="M201,410
+          C193,455 197,500 200,545
+          C203,590 209,640 214,700
+          L240,700
+          C236,640 230,590 227,545
+          C224,500 228,455 229,410 Z"
+       fill="url(#colflex)" opacity="0.8" stroke="#3fffdd" stroke-width="1.5"/>
+ <!-- 右柱 -->
+ <path d="M281,410
+          C283,455 279,500 276,545
+          C273,590 267,640 262,700
+          L288,700
+          C293,640 299,590 302,545
+          C305,500 309,455 305,410 Z"
+       fill="url(#colflex)" opacity="0.8" stroke="#3fffdd" stroke-width="1.5"/>
+
+ <!-- 自适应排气孔: 沿柱身分布的小圆(高压张开) -->
+ <g fill="#0a1f1a" stroke="#7fffe6" stroke-width="0.8">
+   <circle cx="212" cy="470" r="3"/><circle cx="222" cy="500" r="3"/>
+   <circle cx="209" cy="540" r="3"/><circle cx="218" cy="580" r="3"/>
+   <circle cx="212" cy="630" r="3"/>
+   <circle cx="294" cy="470" r="3"/><circle cx="284" cy="500" r="3"/>
+   <circle cx="297" cy="540" r="3"/><circle cx="288" cy="580" r="3"/>
+   <circle cx="294" cy="630" r="3"/>
+ </g>
+ <text x="358" y="500" fill="#7fffe6" font-size="11">自适应排气孔</text>
+ <text x="358" y="514" fill="#3f9e8e" font-size="10">高压张开·低压闭合·可复用</text>
+
+ <!-- 柔性壁变形指示: 双向小箭头表现"弹性鼓胀" -->
+ <g stroke="#a7f3d0" stroke-width="1" opacity="0.7">
+  <line x1="196" y1="520" x2="188" y2="520" marker-end="url(#arr)"/>
+  <line x1="310" y1="520" x2="318" y2="520" marker-end="url(#arr)"/>
+ </g>
+ <text x="60" y="524" fill="#a7f3d0" font-size="10">柔性壁弹性</text>
+ <text x="60" y="538" fill="#a7f3d0" font-size="10">鼓胀变形吸能</text>
+
+ <!-- 锥形宽度标注 -->
+ <line x1="201" y1="410" x2="229" y2="410" stroke="#7fffe6" stroke-width="2"/>
+ <text x="150" y="440" fill="#7fffe6" font-size="10">上Ø26(粗·稳)</text>
+ <line x1="214" y1="700" x2="240" y2="700" stroke="#7fffe6" stroke-width="2"/>
+ <text x="120" y="700" fill="#7fffe6" font-size="10">下Ø13(细·软)</text>
+
+ <!-- 段0 充气垫 -->
+ <ellipse cx="227" cy="712" rx="20" ry="9" fill="#60a5fa" opacity="0.7" stroke="#60a5fa"/>
+ <ellipse cx="275" cy="712" rx="20" ry="9" fill="#60a5fa" opacity="0.7" stroke="#60a5fa"/>
+ <text x="358" y="712" fill="#93c5fd" font-size="11">段0 充气垫</text>
+
+ <!-- 地面 -->
+ <rect x="42" y="720" width="408" height="24" fill="#2f3d24"/>
+ <line x1="42" y1="720" x2="450" y2="720" stroke="#5a7040" stroke-width="2"/>
+
+ <!-- 行程标注 120cm = 360px: y=410->720 是310px≈103cm可见, 标注等效130cm含变形 -->
+ <line x1="62" y1="410" x2="62" y2="720" stroke="#ff6b6b" stroke-width="1.5" marker-end="url(#arr)" marker-start="url(#arr)"/>
+ <text x="54" y="565" fill="#ff9a9a" font-size="12" transform="rotate(-90 54 565)" text-anchor="middle">气柱120cm(+材料变形~10)</text>
+
+ <!-- 速度箭头 -->
+ <line x1="435" y1="230" x2="435" y2="380" stroke="#ff6b6b" stroke-width="2.5" marker-end="url(#arr)"/>
+ <text x="428" y="300" fill="#ff8a8a" font-size="13" font-weight="600" transform="rotate(90 430 300)">v = 8~20 m/s ↓</text>
+</svg>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:18px;">
+
+<div class="panel" style="max-width:430px;">
+<h2>柔性材料 — 三条吸能路径</h2>
+<div class="legend">
+ <span class="sw" style="background:#2ee0bd"></span><b>① 材料应变能</b> — 高延展TPU大变形，吸 ~13% 总能量<br>
+ <span class="sw" style="background:#a7f3d0"></span><b>② 变形延长行程</b> — 弹性壁鼓胀 +10~20cm 有效行程<br>
+ <span class="sw" style="background:#60a5fa"></span><b>③ 气体压缩+排气</b> — 自适应孔洞恒压平台<br>
+ <hr style="border-color:#28313f;margin:8px 0">
+ <b>柔性壁 + 孔洞 = 互补</b>：弹性吸能 + 排气阻尼 = <b>临界阻尼</b>（充分吸能又不反弹）
+</div>
+</div>
+
+<div class="panel" style="max-width:430px;">
+<h2>伤害减免（90kg · 等效130cm）</h2>
+<table>
+<tr><th>速度</th><th>无气囊</th><th>后果</th><th>有气囊</th><th>降幅</th></tr>
+<tr><td>8 m/s</td><td class="die">65g</td><td class="die">多致命</td><td class="live">2.5g</td><td>96%</td></tr>
+<tr><td>12 m/s</td><td class="die">147g</td><td class="die">多致命</td><td class="live">5.6g</td><td>96%</td></tr>
+<tr><td>15 m/s</td><td class="die">229g</td><td class="die">必死</td><td class="live">8.8g</td><td>96%</td></tr>
+<tr><td>18 m/s</td><td class="die">330g</td><td class="die">必死</td><td class="live">12.7g</td><td>96%</td></tr>
+<tr><td>20 m/s</td><td class="die">408g</td><td class="die">必死</td><td class="live">15.7g</td><td>96%</td></tr>
+</table>
+<div class="legend" style="margin-top:6px;">≤15g 轻微 · 15-25g 中度可存活。8-18m/s 全进"轻微"区。</div>
+</div>
+
+<div class="panel" style="max-width:430px;">
+<h2>泄压/限压机制（v3.4）</h2>
+<table>
+<tr><th>机制</th><th>角色</th><th>可复用</th></tr>
+<tr><td>柔性材料本体</td><td class="live">主吸能</td><td class="live">✅</td></tr>
+<tr><td>自适应孔洞</td><td>超压限幅+阻尼</td><td class="live">✅</td></tr>
+<tr><td>爆破片</td><td>超压终极兜底</td><td class="die">一次性</td></tr>
+<tr><td><s>逐级破裂缝</s></td><td colspan="2"><s>取消（被柔性+孔洞取代）</s></td></tr>
+</table>
+<div class="legend" style="margin-top:6px;">低工作压 0.3–0.5atm 表压 → 超压风险低、更安全。选<b>抗蠕变TPU</b>防折叠存放蠕变。</div>
+</div>
+
+</div>
+</div>
+</body></html>
