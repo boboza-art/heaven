@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh"><head><meta charset="UTF-8">
+<title>New-Boom v3.5 结构图 — 双锥柱·柱底扁盘·尾气导流背板/护颈·多级分级材料</title>
+<style>
+ :root{--bg:#0b0e14;--panel:#151b26;--line:#263141;--cyan:#5fd0ff;--txt:#e6ecf5;--dim:#8b9bb4;}
+ *{box-sizing:border-box;}
+ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;background:linear-gradient(160deg,#0b0e14,#0d1220);color:var(--txt);margin:0;padding:28px;}
+ h1{font-size:23px;margin:0 0 4px;letter-spacing:.3px;}
+ .sub{color:var(--dim);font-size:12.5px;margin-bottom:22px;line-height:1.6;}
+ .wrap{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;}
+ .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,.35);}
+ h2{font-size:14.5px;margin:0 0 13px;color:var(--cyan);font-weight:600;letter-spacing:.3px;}
+ .legend{font-size:12px;line-height:2.0;color:#c3cee0;}
+ .sw{display:inline-block;width:13px;height:13px;border-radius:4px;margin-right:7px;vertical-align:-2px;border:1px solid rgba(255,255,255,.15);}
+ table{border-collapse:collapse;font-size:12px;margin-top:4px;width:100%;}
+ td,th{border:1px solid var(--line);padding:5px 10px;text-align:center;}
+ th{background:#1c2534;color:#9fd0ff;font-weight:600;} 
+ .die{color:#ff7a7a;font-weight:600;} .live{color:#6ee7a8;font-weight:600;} .new{color:#ffd36e;font-weight:700;}
+ svg text{font-family:-apple-system,"PingFang SC",sans-serif;}
+</style></head>
+<body>
+<h1>New-Boom v3.5 · 滑翔伞应急缓冲气囊 — 系统结构图</h1>
+<div class="sub">比例尺 1 格 = 20 cm ｜ 飞行员 175 cm / 90 kg 坐姿 ｜ 双锥形柱 Ø13→26 cm × 120 cm + 柱底 Ø42 cm 扩张扁盘<br>多级分级材料（近端尼龙66耐热 → 远端柔性TPU/Dyneema）｜ 工作压 0.4–0.5 atm 表压 ｜ 目标工况 8–20 m/s 垂直坠落 ｜ 2026-07-29</div>
+
+<div class="wrap">
+
+<div class="panel">
+<h2>系统剖面（严格按比例 · 60 px = 20 cm）</h2>
+<svg width="560" height="900" viewBox="0 0 560 900">
+ <defs>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#16223c"/><stop offset="0.55" stop-color="#0f1626"/><stop offset="1" stop-color="#0b0e14"/></linearGradient>
+  <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#3a4a28"/><stop offset="1" stop-color="#26331b"/></linearGradient>
+  <marker id="arr" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto">
+    <path d="M0,0 L7,3 L0,6 Z" fill="#ff6b6b"/></marker>
+  <marker id="arrB" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto">
+    <path d="M0,0 L7,3 L0,6 Z" fill="#7fd8ff"/></marker>
+  <marker id="garr" markerWidth="10" markerHeight="10" refX="7" refY="3.2" orient="auto">
+    <path d="M0,0 L8,3.2 L0,6.4 Z" fill="#ffd36e"/></marker>
+  <!-- 多级分级材料: 近端(顶,近发生器)热红 -> 远端(底)柔性青 -->
+  <linearGradient id="stage" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#d1490e"/><stop offset="0.28" stop-color="#e0790f"/>
+    <stop offset="0.42" stop-color="#d9a441"/><stop offset="0.62" stop-color="#4bb5a8"/>
+    <stop offset="1" stop-color="#33e6c2"/></linearGradient>
+  <linearGradient id="disk" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#7fd0ff"/><stop offset="1" stop-color="#3f7fc0"/></linearGradient>
+  <radialGradient id="head" cx="0.4" cy="0.35" r="0.7">
+    <stop offset="0" stop-color="#f0c9a0"/><stop offset="1" stop-color="#d19b6e"/></radialGradient>
+  <filter id="soft"><feGaussianBlur stdDeviation="0.4"/></filter>
+ </defs>
+ <rect x="0" y="0" width="560" height="900" fill="url(#sky)"/>
+
+ <!-- 比例网格 每20cm=60px, 地面基线 y=820. 柱顶(坐包下)对应120cm行程 -->
+ <g stroke="#1c2436" stroke-width="1">
+   <line x1="52" y1="820" x2="540" y2="820"/><line x1="52" y1="760" x2="540" y2="760"/>
+   <line x1="52" y1="700" x2="540" y2="700"/><line x1="52" y1="640" x2="540" y2="640"/>
+   <line x1="52" y1="580" x2="540" y2="580"/><line x1="52" y1="520" x2="540" y2="520"/>
+   <line x1="52" y1="460" x2="540" y2="460"/><line x1="52" y1="400" x2="540" y2="400"/>
+   <line x1="52" y1="340" x2="540" y2="340"/><line x1="52" y1="280" x2="540" y2="280"/>
+   <line x1="52" y1="220" x2="540" y2="220"/>
+ </g>
+ <g fill="#556074" font-size="10.5" font-weight="500">
+   <text x="30" y="823">0</text><text x="24" y="703">40</text><text x="24" y="583">80</text>
+   <text x="16" y="463">120</text><text x="16" y="343">160</text><text x="12" y="223">200cm</text>
+ </g>
+
+ <!-- 缠绕/塌陷副伞 -->
+ <path d="M188,64 Q300,26 412,64 Q408,80 380,84 Q300,72 220,84 Q192,80 188,64 Z" fill="#3d4c6b" opacity="0.72"/>
+ <path d="M188,64 Q300,26 412,64" fill="none" stroke="#5a6d92" stroke-width="1.2"/>
+ <text x="300" y="48" fill="#9fb0cc" font-size="10.5" text-anchor="middle">缠绕 / 塌陷副伞 — 悬垂单摆自稳，保持脚朝下</text>
+ <!-- 伞绳 -->
+ <g stroke="#6b7a99" stroke-width="1" opacity="0.8">
+   <line x1="238" y1="82" x2="270" y2="196"/><line x1="300" y1="84" x2="292" y2="196"/><line x1="362" y1="82" x2="316" y2="196"/>
+ </g>
+
+ <!-- ===== ① 护颈圈 (NEW) ===== -->
+ <path d="M262,182 q-20,-6 -24,14 q-3,18 16,22 q7,1 12,-2 q-11,-14 -4,-32 z" fill="#f472b6" opacity="0.8" stroke="#ec5fac" stroke-width="1.2"/>
+ <circle cx="243" cy="208" r="2" fill="#fbcfe8"/>
+ 
+ <!-- 人体 175cm 坐姿 (更精细) -->
+ <g stroke="#0a0d13" stroke-width="1.1">
+  <!-- 头 -->
+  <ellipse cx="292" cy="196" rx="19" ry="22" fill="url(#head)"/>
+  <!-- 颈 -->
+  <path d="M285,214 h14 v10 h-14 z" fill="#e0b48c"/>
+  <!-- 躯干 -->
+  <path d="M270,224 Q292,219 314,224 L322,344 Q292,357 262,344 Z" fill="#4573c4"/>
+  <!-- 手臂 -->
+  <path d="M314,232 Q338,266 330,332 L318,332 Q325,272 306,240 Z" fill="#3a5ca0"/>
+  <!-- 大腿(前伸坐姿) -->
+  <path d="M266,340 Q330,332 374,358 L376,388 Q330,378 264,380 Z" fill="#54658a"/>
+  <!-- 小腿 -->
+  <path d="M356,376 L378,378 L390,536 L366,536 Z" fill="#4a5b7e"/>
+  <!-- 脚 -->
+  <path d="M364,534 L394,534 L399,554 L361,554 Z" fill="#2f3b52"/>
+ </g>
+ <text x="130" y="200" fill="#c3cee0" font-size="11" font-weight="500">飞行员</text>
+ <text x="130" y="215" fill="#8b9bb4" font-size="9.5">175 cm / 90 kg</text>
+ <text x="96" y="176" fill="#f9a8d4" font-size="11" class="new">① EPP 泡沫护颈圈</text>
+ <text x="96" y="189" fill="#c9789f" font-size="9">被动 · +80g · 防颈过伸/侧磕</text>
+
+ <!-- ===== ② 背板夹层气囊 (NEW) ===== -->
+ <path d="M263,226 q-18,3 -19,22 l0,92 q0,17 19,19 z" fill="#a78bfa" opacity="0.62" stroke="#9a7ff0" stroke-width="1.2"/>
+ <g stroke="#c4b5fd" stroke-width="0.6" opacity="0.5">
+   <line x1="250" y1="256" x2="262" y2="256"/><line x1="250" y1="286" x2="262" y2="286"/><line x1="250" y1="316" x2="262" y2="316"/>
+ </g>
+ <text x="90" y="286" fill="#c4b5fd" font-size="11" class="new">② 背板夹层气囊</text>
+ <text x="90" y="299" fill="#9a86c9" font-size="9">尾气导流充入 · +100g</text>
+ <text x="90" y="311" fill="#9a86c9" font-size="9">护后背/脊柱（+Gx 最耐受向）</text>
+
+ <!-- 坐包 harness -->
+ <path d="M256,344 Q292,338 376,352 L380,382 Q292,396 252,382 Z" fill="#2b3548" stroke="#4a5c7a" stroke-width="1.2"/>
+ <text x="150" y="372" fill="#9fb0cc" font-size="10">坐包 harness</text>
+
+ <!-- 段3 被动气室 -->
+ <ellipse cx="300" cy="404" rx="74" ry="15" fill="#c084fc" opacity="0.42" stroke="#c084fc" stroke-width="1"/>
+ <text x="420" y="406" fill="#d8b4fe" font-size="9.5">段3 被动室</text>
+
+ <!-- 发生器(挂起,淡显) -->
+ <rect x="274" y="414" width="16" height="12" rx="3" fill="#f59e0b" opacity="0.5"/>
+ <rect x="310" y="414" width="16" height="12" rx="3" fill="#f59e0b" opacity="0.5"/>
+ <text x="150" y="424" fill="#a07820" font-size="8.5">发生器 hybrid（待立项）</text>
+
+ <!-- 尾气导流(黄色曲线) 从柱顶 -> 背板 & 护颈 -->
+ <path d="M284,410 Q236,346 256,296" fill="none" stroke="#ffd36e" stroke-width="1.6" stroke-dasharray="5 3" marker-end="url(#garr)" opacity="0.9"/>
+ <path d="M290,410 Q244,250 250,214" fill="none" stroke="#ffd36e" stroke-width="1.3" stroke-dasharray="5 3" marker-end="url(#garr)" opacity="0.75"/>
+ <text x="150" y="340" fill="#ffd36e" font-size="9.5" class="new">尾气导流</text>
+ <text x="150" y="352" fill="#c9a94f" font-size="8.5">（缓冲末段过剩气）</text>
+
+ <!-- ===== 双锥形柱 · 多级分级材料 (顶y=412 -> 底y=772, =120cm=360px) ===== -->
+ <!-- 左柱: 上粗Ø26下细Ø13 -->
+ <path d="M266,412
+          C258,470 261,540 265,610
+          C268,660 273,715 277,772
+          L303,772
+          C299,715 294,660 291,610
+          C287,540 290,470 292,412 Z"
+       fill="url(#stage)" opacity="0.9" stroke="#2fe6c8" stroke-width="1.3"/>
+ <!-- 右柱 -->
+ <path d="M312,412
+          C314,470 311,540 307,610
+          C304,660 299,715 295,772
+          L321,772
+          C325,715 330,660 333,610
+          C337,540 340,470 342,412 Z"
+       fill="url(#stage)" opacity="0.9" stroke="#2fe6c8" stroke-width="1.3"/>
+
+ <!-- 高光边 -->
+ <path d="M266,412 C258,470 261,540 265,610 C268,660 273,715 277,772" fill="none" stroke="#fff" stroke-width="0.8" opacity="0.18"/>
+
+ <!-- 分级分界虚线 -->
+ <line x1="260" y1="510" x2="348" y2="510" stroke="#fff" stroke-width="0.6" stroke-dasharray="3 3" opacity="0.4"/>
+ <line x1="258" y1="620" x2="350" y2="620" stroke="#fff" stroke-width="0.6" stroke-dasharray="3 3" opacity="0.4"/>
+
+ <!-- 分级材料标注(右侧引线) -->
+ <line x1="342" y1="460" x2="392" y2="460" stroke="#fb923c" stroke-width="0.8"/>
+ <text x="396" y="457" fill="#fb923c" font-size="10">第1级 尼龙66+硅涂层</text>
+ <text x="396" y="470" fill="#c47a3d" font-size="8.5">近发生器 · 耐 400–600°C</text>
+ <line x1="345" y1="565" x2="392" y2="565" stroke="#e0a848" stroke-width="0.8"/>
+ <text x="396" y="562" fill="#e0a848" font-size="10">第2级 耐温 TPU</text>
+ <text x="396" y="575" fill="#b0862a" font-size="8.5">气体已降 ~220°C</text>
+ <line x1="335" y1="690" x2="392" y2="690" stroke="#33e6c2" stroke-width="0.8"/>
+ <text x="396" y="687" fill="#33e6c2" font-size="10">第3级 柔性TPU/Dyneema</text>
+ <text x="396" y="700" fill="#3f9e8e" font-size="8.5">气体已降 ~60°C · 大变形吸能</text>
+
+ <!-- 自适应排气孔 -->
+ <g fill="#08201b" stroke="#7fffe6" stroke-width="0.8">
+   <circle cx="272" cy="655" r="2.6"/><circle cx="281" cy="690" r="2.6"/><circle cx="274" cy="725" r="2.6"/>
+   <circle cx="328" cy="655" r="2.6"/><circle cx="319" cy="690" r="2.6"/><circle cx="326" cy="725" r="2.6"/>
+ </g>
+ <text x="396" y="740" fill="#7fffe6" font-size="9">自适应排气孔（削峰+阻尼）</text>
+
+ <!-- 柱径标注 -->
+ <line x1="266" y1="412" x2="292" y2="412" stroke="#2fe6c8" stroke-width="2"/>
+ <line x1="312" y1="412" x2="342" y2="412" stroke="#2fe6c8" stroke-width="2"/>
+ <text x="150" y="440" fill="#2fe6c8" font-size="9">上 Ø26（粗·稳）</text>
+
+ <!-- ===== ③ 柱底扩张扁盘 (NEW) Ø42cm = 126px ===== -->
+ <ellipse cx="300" cy="778" rx="112" ry="20" fill="url(#disk)" opacity="0.62" stroke="#7fd8ff" stroke-width="2"/>
+ <ellipse cx="300" cy="778" rx="112" ry="20" fill="none" stroke="#b8e8ff" stroke-width="0.8" opacity="0.6"/>
+ <ellipse cx="300" cy="774" rx="70" ry="11" fill="#7fd0ff" opacity="0.35"/>
+ <text x="70" y="782" fill="#7fd8ff" font-size="11" class="new">③ 柱底扩张扁盘</text>
+ <text x="70" y="795" fill="#5a9ec9" font-size="9">Ø42 cm · 分离"行程"与"受力面"</text>
+ <text x="70" y="807" fill="#5a9ec9" font-size="9">解 P-phys3（低压细柱力不足）</text>
+
+ <!-- 扁盘宽度标注 -->
+ <line x1="188" y1="802" x2="412" y2="802" stroke="#7fd8ff" stroke-width="1" marker-start="url(#arrB)" marker-end="url(#arrB)"/>
+ <text x="300" y="815" fill="#7fd8ff" font-size="9" text-anchor="middle">大接触面 → 低压 0.5atm 也够 8.4kN 缓冲力</text>
+
+ <!-- 地面 -->
+ <rect x="52" y="820" width="488" height="26" fill="url(#ground)"/>
+ <line x1="52" y1="820" x2="540" y2="820" stroke="#6a8048" stroke-width="2"/>
+ <g stroke="#4a5c2e" stroke-width="1" opacity="0.6">
+   <line x1="80" y1="820" x2="70" y2="834"/><line x1="140" y1="820" x2="130" y2="834"/>
+   <line x1="440" y1="820" x2="430" y2="834"/><line x1="500" y1="820" x2="490" y2="834"/>
+ </g>
+
+ <!-- 行程标注 120cm -->
+ <line x1="70" y1="412" x2="70" y2="772" stroke="#ff6b6b" stroke-width="1.5" marker-end="url(#arr)" marker-start="url(#arr)"/>
+ <text x="62" y="595" fill="#ff9a9a" font-size="11" font-weight="600" transform="rotate(-90 62 595)" text-anchor="middle">缓冲行程 120 cm</text>
+
+ <!-- 下落速度 -->
+ <line x1="510" y1="250" x2="510" y2="380" stroke="#ff6b6b" stroke-width="2.5" marker-end="url(#arr)"/>
+ <text x="524" y="320" fill="#ff8a8a" font-size="12" font-weight="700" transform="rotate(90 524 320)">v = 8~20 m/s ↓</text>
+</svg>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:16px;">
+
+<div class="panel" style="max-width:440px;">
+<h2>v3.5 相对 v3.4 的三处升级</h2>
+<div class="legend">
+ <span class="sw" style="background:linear-gradient(#7fd0ff,#3f7fc0)"></span><b class="new">③ 柱底扩张扁盘 Ø42cm</b><br><span style="color:#93a3ba">　分离"行程(柱)"与"受力面(盘)"，解 P-phys3</span><br>
+ <span class="sw" style="background:#a78bfa"></span><b class="new">② 背板夹层气囊</b><br><span style="color:#93a3ba">　复用主柱末段"尾气"导流充入，护后背/脊柱</span><br>
+ <span class="sw" style="background:#f472b6"></span><b class="new">① EPP 泡沫护颈圈</b><br><span style="color:#93a3ba">　被动零充气，防颈过伸+侧磕</span><br>
+ <span class="sw" style="background:linear-gradient(#d1490e,#33e6c2)"></span><b>多级分级材料</b><br><span style="color:#93a3ba">　近端尼龙66耐热 → 远端柔性TPU，气体沿程降温（解 M1）</span>
+</div>
+</div>
+
+<div class="panel" style="max-width:440px;">
+<h2>P-phys3 修正效果（15 m/s 设计点）</h2>
+<table>
+<tr><th>方案</th><th>接触面</th><th>缓冲力</th><th>结果</th></tr>
+<tr><td>v3.4 细柱底</td><td>Ø26（0.1㎡）</td><td class="die">4.3 kN</td><td class="die">力不足</td></tr>
+<tr><td class="new">v3.5 扁盘</td><td>Ø42cm</td><td class="live">8.4 kN</td><td class="live">9.6g ✅</td></tr>
+</table>
+<div class="legend" style="margin-top:8px;">⚠️ g 值为<b>平均减速度</b>；真实峰值约 1.5–2 倍（P-phys1）。</div>
+</div>
+
+<div class="panel" style="max-width:440px;">
+<h2>后背 / 头部保护（问题2）</h2>
+<table>
+<tr><th>部件</th><th>代价</th><th>保护</th></tr>
+<tr><td>EPP 泡沫护颈圈</td><td>+80g</td><td>头颈</td></tr>
+<tr><td>背板尾气气囊</td><td>+100g</td><td>后背/脊柱</td></tr>
+<tr><td><b>合计</b></td><td class="live">~+150g</td><td>复用气源</td></tr>
+</table>
+<div class="legend" style="margin-top:8px;">残余翻倒仅 3–4 m/s（低能量）。尾气本要泄掉 → 二次落地保护近乎<b>免费</b>。</div>
+</div>
+
+<div class="panel" style="max-width:440px;">
+<h2>伤害减免（90kg · 平均减速度）</h2>
+<table>
+<tr><th>速度</th><th>无气囊</th><th>v3.5</th><th>判定</th></tr>
+<tr><td>12 m/s</td><td class="die">147g</td><td class="live">6.1g</td><td class="live">轻微</td></tr>
+<tr><td>15 m/s</td><td class="die">229g</td><td class="live">9.6g</td><td class="live">轻微</td></tr>
+<tr><td>18 m/s</td><td class="die">330g</td><td class="live">13g</td><td class="live">轻微</td></tr>
+<tr><td>20 m/s</td><td class="die">408g</td><td class="live">16g</td><td>中度可存活</td></tr>
+</table>
+</div>
+
+<div class="panel" style="max-width:440px;">
+<h2>挂起 / 设计边界</h2>
+<div class="legend">
+ 🔧 <b>发生器 + 歧管</b> — 工程决策，等立项<br>
+ 🚩 <b>P-phys4 水平撞击</b> — 设计边界盲区；本装置只防垂直坠落<br>
+ 🚩 <b>误触发阈值</b> — 依赖飞行数据，后置
+</div>
+</div>
+
+</div>
+</div>
+</body></html>
